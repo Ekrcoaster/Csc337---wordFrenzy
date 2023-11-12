@@ -4,6 +4,9 @@
  * Purpose: This is the main server code
  */
 
+const GAME = require("./game");
+GAME.Start();
+
 // --------------
 //   THE SERVER
 // --------------
