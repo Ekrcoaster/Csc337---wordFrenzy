@@ -23,6 +23,7 @@ class ActiveGame {
     // the game lasts 60 seconds
     gameTime = 60*1000;
     gameOverAt;
+    gameStartedAt;
 
     /**@type {{name: String, submission: String}[]} */
     submissions = [];
@@ -41,8 +42,6 @@ class ActiveGame {
         // choose a random room from the list, if you would like to choose this rule, provide a list of 1
         this.ruleSet = possibleRules[Math.floor(Math.random() * possibleRules.length)];
 
-        // game is over in 60 seconds
-        this.gameOverAt = Date.now() + this.gameTime;
         this.onGameComplete = onGameComplete;
     }
 
@@ -63,7 +62,16 @@ class ActiveGame {
 
         this.state = state;
         if(state == "playing") {
-            console.log(`-----\nStarting game with ${Object.keys(this.players).length} players!]\nCategory: ${this.ruleSet.name}\n-----`);
+            // game is over in 60 seconds
+            this.gameOverAt = Date.now() + this.gameTime;
+            this.gameStartedAt = Date.now();
+
+            console.log(`-----\nStarting game with ${Object.keys(this.players).length} players!]`);
+            console.log(` Category: ${this.ruleSet.name}`);
+            console.log(` Started at: ${this.gameStartedAt}`);
+            console.log(` Length: ${this.gameTime}`);
+            console.log(` Ending At: ${this.gameOverAt}`);
+            console.log("-----");
 
             // after gameTime is done, automatically stop
             setTimeout(() => {
@@ -78,25 +86,26 @@ class ActiveGame {
     }
 
     /**
-     * This will submit the player's submission, returning true or false if it was correct
+     * This will submit the player's submission, returning null if it worked, a string with the error message
+     * if failed
      * @param {String} playerName 
      * @param {String} submission 
      */
     sendSubmission(playerName, submission) {
         if(this.isTimeUp()) this.setState("done");
-        if(this.state != "playing") return false;
+        if(this.state != "playing") return "Game hasn't started / Game has ended";
 
         if(!this.ruleSet.doesMatch(submission))
-            return false;
+            return "Invalid submission! Try again!";
 
         let player = this.getPlayer(playerName);
-        if(player == null) throw "Player is null! Can't find: " + playerName;
+        if(player == null) return "Player is null! Can't find: " + playerName;
 
         // add the submissions
         player.submissions.push(submission);
         this.submissions.push({"name": playerName, "submission": submission});
         
-        return true;
+        return null;
     }
 
     isTimeUp() {
@@ -215,4 +224,49 @@ exports.Start = () => {
     console.log(`Trying: "apple Yum"  --  ${ACTIVE_GAME.sendSubmission("bob", "Apple Yum")}`);
     console.log(`Trying: "rhyme"  --  ${ACTIVE_GAME.sendSubmission("alice", "Rhyme")}`);
 }
-exports.Start();
+//exports.Start();
+
+exports.GetState = () => {
+    if(ACTIVE_GAME == null) return {error: "No game exists"};
+    return {
+        state: ACTIVE_GAME.state,
+        gameOverAt: ACTIVE_GAME.gameOverAt,
+        submissions: ACTIVE_GAME.submissions,
+        scores: ACTIVE_GAME.getPlayerScores(),
+        playerNames: Object.keys(ACTIVE_GAME.players)
+    }
+}
+
+exports.Submit = (name, submission) => {
+    if(ACTIVE_GAME == null) return {error: "No game exists"};
+    let result = ACTIVE_GAME.sendSubmission(name, submission);
+    if(result == null) return {ok: true};
+    return {error: result}
+}
+
+exports.AddPlayer = (name) => {
+    if(ACTIVE_GAME == null) return {error: "No game exists"};
+    if(ACTIVE_GAME.getPlayer(name) != null) return {error: "This player already exists!"};
+    ACTIVE_GAME.addPlayer(new ActivePlayer(name));
+    return {ok: true};
+}
+
+exports.StartGame = () => {
+    if(ACTIVE_GAME == null) return {error: "No game exists!"};
+    if(ACTIVE_GAME.state != "waitingRoom") return {error: "Game is not in waiting room"};
+    ACTIVE_GAME.setState("playing");
+    return {ok: true}
+}
+
+exports.CreateGame = () => {
+    if(ACTIVE_GAME != null) return {error: "Game already exists, you should delete it"};
+
+    // create a new game with the possible game sets
+    ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS, (game) => {
+        console.log(`-----\nGame Over! Here is the dry game:`);
+        console.log(JSON.stringify(game.getDryGameResults()));
+        console.log("-----");
+    });
+
+    return {ok: true}
+}

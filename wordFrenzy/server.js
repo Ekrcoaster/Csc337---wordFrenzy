@@ -12,13 +12,13 @@ GAME.Start();
 // --------------
 const express = require("express");
 const app = express();
-const port = 50;
+const port = 5001;
 
 const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 
 app.use(bodyParser.json());
-app.use(cookieParser);
+//app.use(cookieParser);
 app.use("/app/*", handleLockedPage);
 app.use(express.static(__dirname + "/public_html/"));
 
@@ -33,8 +33,27 @@ function handleLockedPage(req, res, next) {
     next();
 }
 
+// active game requests
+app.get("/activeGame/getState", (req, res) => {
+    res.json(GAME.GetState());
+});
 
+app.post("/activeGame/submit", (req, res) => {
+    res.json(GAME.Submit(req.body.username, req.body.submission));
+});
 
+app.post("/activeGame/addPlayer", (req, res) => {
+    res.json(GAME.AddPlayer(req.params.USERNAME));
+});
+
+app.post("/activeGame/start", (req, res) => {
+    res.json(GAME.StartGame());
+});
+
+// todo, allow game settings to be created
+app.post("/activeGame/createGame", (req, res) => {
+    res.json(GAME.CreateGame());
+});
 
 // --------------
 // THE DATABASE
