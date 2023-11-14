@@ -7,6 +7,7 @@
 // the following are types used in vscode to help make writing js easier, they do not effect the code at all
 /**@typedef {("waitingRoom"|"playing"|"done")} ActiveGameStates */
 /**@typedef {("allowedWords"|"regex")} ActiveGameRuleSetMode */
+/**@callback GameCompleteCallback @param {ActiveGame} game */
 
 /*
     This class controls an active game, its state, players, and score
@@ -26,8 +27,11 @@ class ActiveGame {
     /**@type {{name: String, submission: String}[]} */
     submissions = [];
 
-    /**@param {ActiveGameRuleSet[]} possibleRules */
-    constructor(possibleRules) {
+    /**@type {GameCompleteCallback} */
+    onGameComplete;
+
+    /**@param {ActiveGameRuleSet[]} possibleRules @param {GameCompleteCallback} onGameComplete */
+    constructor(possibleRules, onGameComplete) {
         this.id = "";
         for(let i = 0; i < 14; i++)
             this.id += "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)];
@@ -39,6 +43,7 @@ class ActiveGame {
 
         // game is over in 60 seconds
         this.gameOverAt = Date.now() + this.gameTime;
+        this.onGameComplete = onGameComplete;
     }
 
     addPlayer(player) {
@@ -67,7 +72,7 @@ class ActiveGame {
         }
 
         if(state == "done") {
-            console.log(`-----\nGame Over!\nCategory: ${this.ruleSet.name}\nSubmissions:`, this.submissions, `-----`);
+            this.onGameComplete(this);
         }
         return this;
     }
@@ -97,6 +102,23 @@ class ActiveGame {
     isTimeUp() {
         return Date.now() > this.gameOverAt;
     }
+
+    getPlayerScores() {
+        let players = [];
+        for(let name in this.players) {
+            players.push({score: this.getPlayer(name).calculateScore(), name: name});
+        }
+        players.sort((a, b) => b.score - a.score);
+        return players;
+    }
+
+    getDryGameResults() {
+        return {
+            id: this.id,
+            ruleSet: this.ruleSet,
+            scores: this.getPlayerScores()
+        }
+    }
 }
 
 /**
@@ -108,6 +130,10 @@ class ActivePlayer {
 
     constructor(name) {
         this.name = name;
+    }
+
+    calculateScore() {
+        return this.submissions.length * 10;
     }
 }
 
@@ -172,16 +198,21 @@ var POSSIBLE_GAME_SETS = [
 
 exports.Start = () => {
     // testing
-    ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS);
+    ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS, (game) => {
+        console.log(`-----\nGame Over! Here is the dry game:`);
+        console.log(JSON.stringify(game.getDryGameResults()));
+        console.log("-----");
+    });
     ACTIVE_GAME.addPlayer(new ActivePlayer("bob"));
+    ACTIVE_GAME.addPlayer(new ActivePlayer("alice"));
 
     ACTIVE_GAME.setState("playing");
 
     console.log(`Trying: "Alice"  --  ${ACTIVE_GAME.sendSubmission("bob", "Alice")}`);
     console.log(`Trying: "Bacon"  --  ${ACTIVE_GAME.sendSubmission("bob", "Bacon")}`);
-    console.log(`Trying: "112312312"  --  ${ACTIVE_GAME.sendSubmission("bob", "112312312")}`);
-    console.log(`Trying: "TestnigAAAAA"  --  ${ACTIVE_GAME.sendSubmission("bob", "TestnigAAAAA")}`);
+    console.log(`Trying: "112312312"  --  ${ACTIVE_GAME.sendSubmission("alice", "112312312")}`);
+    console.log(`Trying: "TestnigAAAAA"  --  ${ACTIVE_GAME.sendSubmission("alice", "TestnigAAAAA")}`);
     console.log(`Trying: "apple Yum"  --  ${ACTIVE_GAME.sendSubmission("bob", "Apple Yum")}`);
-    console.log(`Trying: "rhyme"  --  ${ACTIVE_GAME.sendSubmission("bob", "Rhyme")}`);
+    console.log(`Trying: "rhyme"  --  ${ACTIVE_GAME.sendSubmission("alice", "Rhyme")}`);
 }
 exports.Start();
