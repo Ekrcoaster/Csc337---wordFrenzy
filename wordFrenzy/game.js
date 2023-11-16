@@ -206,6 +206,7 @@ var POSSIBLE_GAME_SETS = [
 ]
 
 exports.Start = () => {
+    return;
     // testing
     ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS, (game) => {
         console.log(`-----\nGame Over! Here is the dry game:`);
@@ -226,7 +227,7 @@ exports.Start = () => {
 }
 //exports.Start();
 
-exports.GetState = () => {
+exports.GetGame = () => {
     if(ACTIVE_GAME == null) return {error: "No game exists"};
     return {
         state: ACTIVE_GAME.state,
@@ -246,6 +247,7 @@ exports.Submit = (name, submission) => {
 
 exports.AddPlayer = (name) => {
     if(ACTIVE_GAME == null) return {error: "No game exists"};
+    if(name == null) return {error: "Username is null"}
     if(ACTIVE_GAME.getPlayer(name) != null) return {error: "This player already exists!"};
     ACTIVE_GAME.addPlayer(new ActivePlayer(name));
     return {ok: true};

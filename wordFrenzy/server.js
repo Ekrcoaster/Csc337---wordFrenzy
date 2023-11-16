@@ -34,26 +34,28 @@ function handleLockedPage(req, res, next) {
 }
 
 // active game requests
-app.get("/activeGame/getState", (req, res) => {
-    res.json(GAME.GetState());
-});
 
-app.post("/activeGame/submit", (req, res) => {
-    res.json(GAME.Submit(req.body.username, req.body.submission));
+// todo, allow game settings to be created
+app.post("/activeGame/createGame", (req, res) => {
+    res.json(GAME.CreateGame());
 });
 
 app.post("/activeGame/addPlayer", (req, res) => {
-    res.json(GAME.AddPlayer(req.params.USERNAME));
+    res.json(GAME.AddPlayer(req.body.username));
 });
 
 app.post("/activeGame/start", (req, res) => {
     res.json(GAME.StartGame());
 });
 
-// todo, allow game settings to be created
-app.post("/activeGame/createGame", (req, res) => {
-    res.json(GAME.CreateGame());
+app.get("/activeGame/getGame", (req, res) => {
+    res.json(GAME.GetGame());
 });
+
+app.post("/activeGame/submit", (req, res) => {
+    res.json(GAME.Submit(req.body.username, req.body.submission));
+});
+
 
 // --------------
 // THE DATABASE
