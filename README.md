@@ -35,3 +35,4 @@ The game has a few different states:
 
 ## Dry Game
 Thats just the name I came up with for a game that has already been played and should be stored in the history. This is the type that is stored in the mongodb database. We can change this if it is too confusing.
+=======
