@@ -26,7 +26,6 @@ var onGameUpdate = (game => {
     document.getElementById("submissionDisplay").innerHTML = buildSubmissions(game.submissions);
 
     for(let i = 0; i < game.scores.length; i++) {
-        console.log(game.scores[i])
         if(game.scores[i].name == "bob") {
             document.getElementById("playerName").innerText = game.scores[i].name;
             document.getElementById("playerScore").innerText = game.scores[i].score;
