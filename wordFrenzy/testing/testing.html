@@ -1,0 +1,43 @@
+<body>
+
+    <h1>Active Game</h1>
+    <button onclick="post('/activeGame/createGame', {})">Create Game</button>
+    <br><br>
+    <input id="createPlayerName" type="text" placeholder="New Player Name">
+    <button onclick="post('/activeGame/addPlayer', {username: field('createPlayerName')})">Create Player</button>
+    <br><br>
+    <button onclick="post('/activeGame/start', {})">Start Game</button>
+    <br><br>
+    <button onclick="get('/activeGame/getGame')">Get Game</button>
+    <br><br>
+    <input id="submissionName" type="text" placeholder="Submission Player Name">
+    <input id="submissionValue" type="text" placeholder="Submission Text">
+    <button onclick="post('/activeGame/submit', {username: field('submissionName'), submission: field('submissionValue')})">Send Submission ^^</button>
+    
+    <h1>Past Games</h1>
+
+    <input id="pastPlayerName" type="text" placeholder="Past Games Player Name">
+    <button onclick="get(`/pastGames/get/${field('pastPlayerName')}`)">Get Past Games</button>
+
+    <script>
+
+        function get(address) {
+            fetch(address).then((res) => res.json()).then((res) => console.log(res)).catch((err) => console.error(err));
+        }
+
+        function post(address, body) {
+            fetch(address, {
+                "method": "POST",
+                "headers": {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                "body": JSON.stringify(body)
+            }).then((res) => res.json()).then((res) => console.log(res)).catch((err) => console.error(err));
+        }
+
+        function field(id) {
+            return document.getElementById(id).value;
+        }
+    </script>
+</body>

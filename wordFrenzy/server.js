@@ -7,6 +7,9 @@
 const GAME = require("./game");
 GAME.Start();
 
+const DATABASE = require("./database");
+exports.DATABASE = DATABASE;
+
 // --------------
 //   THE SERVER
 // --------------
@@ -21,6 +24,7 @@ app.use(bodyParser.json());
 //app.use(cookieParser);
 app.use("/app/*", handleLockedPage);
 app.use(express.static(__dirname + "/public_html/"));
+app.use(express.static(__dirname + "/testing/"));
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}!`);
@@ -33,7 +37,9 @@ function handleLockedPage(req, res, next) {
     next();
 }
 
-// active game requests
+// ------------------------
+//   Active Game Requests
+// ------------------------
 
 // todo, allow game settings to be created
 app.post("/activeGame/createGame", (req, res) => {
@@ -57,16 +63,14 @@ app.post("/activeGame/submit", (req, res) => {
 });
 
 
-// --------------
-// THE DATABASE
-// --------------
+// ------------------------
+//    Past Game Requests
+// ------------------------
 
-const mongoose = require("mongoose");
-const mongoDBURL = "mongodb://127.0.0.1:27017/wordFrenzy";
-mongoose.connect(mongoDBURL);
-mongoose.connection.on('error', () => {
-    console.log('Connection Error')
-});
-mongoose.connection.on("open", () => {
-    console.log("Database Connected");
+app.get("/pastGames/get/:USERNAME", (req, res) => {
+    DATABASE.GetPastGames(req.params.USERNAME).then((games) => {
+        res.json({games: games});
+    }).catch((err) => {
+        res.json({error: err}); 
+    });
 });

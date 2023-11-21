@@ -4,6 +4,8 @@
  * Purpose: This is the main serverside code for the game
  */
 
+const SERVER = require("./server");
+
 // the following are types used in vscode to help make writing js easier, they do not effect the code at all
 /**@typedef {("waitingRoom"|"playing"|"done")} ActiveGameStates */
 /**@typedef {("allowedWords"|"regex")} ActiveGameRuleSetMode */
@@ -31,6 +33,8 @@ class ActiveGame {
     /**@type {GameCompleteCallback} */
     onGameComplete;
 
+    hasBeenSavedToPastGame = false;
+
     /**@param {ActiveGameRuleSet[]} possibleRules @param {GameCompleteCallback} onGameComplete */
     constructor(possibleRules, onGameComplete) {
         this.id = "";
@@ -43,6 +47,7 @@ class ActiveGame {
         this.ruleSet = possibleRules[Math.floor(Math.random() * possibleRules.length)];
 
         this.onGameComplete = onGameComplete;
+        this.hasBeenSavedToPastGame = false;
     }
 
     addPlayer(player) {
@@ -121,10 +126,15 @@ class ActiveGame {
         return players;
     }
 
-    getDryGameResults() {
+    isSafeToDestroy() {
+        return this.hasBeenSavedToPastGame;
+    }
+
+    getAsPastGame() {
         return {
             id: this.id,
-            ruleSet: this.ruleSet,
+            timePlayedAt: this.gameStartedAt,
+            ruleSet: this.ruleSet.name,
             scores: this.getPlayerScores()
         }
     }
@@ -205,12 +215,13 @@ var POSSIBLE_GAME_SETS = [
     new ActiveGameRuleSet("Words that rhyme with \"time\"").setAllowedWords(["crime", "rhyme"])
 ]
 
+exports.ACTIVE_GAME = ACTIVE_GAME;
 exports.Start = () => {
     return;
     // testing
     ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS, (game) => {
-        console.log(`-----\nGame Over! Here is the dry game:`);
-        console.log(JSON.stringify(game.getDryGameResults()));
+        console.log(`-----\nGame Over! Here is the past game:`);
+        console.log(JSON.stringify(game.getAsPastGame()));
         console.log("-----");
     });
     ACTIVE_GAME.addPlayer(new ActivePlayer("bob"));
@@ -234,6 +245,8 @@ exports.GetGame = () => {
         gameOverAt: ACTIVE_GAME.gameOverAt,
         submissions: ACTIVE_GAME.submissions,
         scores: ACTIVE_GAME.getPlayerScores(),
+        startedAt: ACTIVE_GAME.gameStartedAt,
+        ruleSet: ACTIVE_GAME.ruleSet.name,
         playerNames: Object.keys(ACTIVE_GAME.players)
     }
 }
@@ -261,13 +274,29 @@ exports.StartGame = () => {
 }
 
 exports.CreateGame = () => {
-    if(ACTIVE_GAME != null) return {error: "Game already exists, you should delete it"};
+
+    // allow overriding the current game IF it is safe to destroy
+    if(ACTIVE_GAME != null) {
+        if(ACTIVE_GAME.isSafeToDestroy())
+            console.log("Overriding the old active game for new one. This is ok!");
+        else
+            return {error: "Game already exists, you should delete it"};
+    }
 
     // create a new game with the possible game sets
     ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS, (game) => {
-        console.log(`-----\nGame Over! Here is the dry game:`);
-        console.log(JSON.stringify(game.getDryGameResults()));
+        console.log(`-----\nGame Over! Here is the past game:`);
+        console.log(JSON.stringify(game.getAsPastGame()));
+        console.log("Converting to a past game...");
         console.log("-----");
+
+        // convert to past game
+        SERVER.DATABASE.ConvertActiveGame(game).then((pastGame) => {
+            game.hasBeenSavedToPastGame = true;
+            console.log("Successfully converted active game to past game! Active game is safe to destroy!");
+        }).catch((err) => {
+            console.error("Error converting active game to past game:", err);
+        });
     });
 
     return {ok: true}
