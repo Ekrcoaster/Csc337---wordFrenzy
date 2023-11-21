@@ -21,6 +21,7 @@ app.use(bodyParser.json());
 //app.use(cookieParser);
 app.use("/app/*", handleLockedPage);
 app.use(express.static(__dirname + "/public_html/"));
+app.use(express.static(__dirname + "/testing/"));
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}!`);
