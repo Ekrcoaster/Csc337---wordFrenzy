@@ -2,6 +2,7 @@
 To avoid conflicts, we should each work in our own branch, then merge once the feature we are working on is done
 
 ## API Usage:
+### Active Game
 
 `/activeGame/createGame` (post)
 > This will create a game, eventually params will be able to be passed, but for now theres no params yet.
@@ -21,6 +22,11 @@ To avoid conflicts, we should each work in our own branch, then merge once the f
 > Send a submission for the game
 > Send body as JSON, in the body you need to include "username" and "submission" (which is the text submission)
 
+### Past Games
+
+`/pastGames/get/:USERNAME` (get)
+> This will fetch all of the past games for a given user
+
 ## Active Game
 The game has a few different states:
 
@@ -31,8 +37,10 @@ The game has a few different states:
 > This is the game itself, this is where everyone is sending submissions and score is kept. Players cannot be added during this stage, if someone joins the website, they should be spectators. Also, the game chooses an end time based on when this state is changed, so maybe the UI could have a countdown.
 
 **done**
-> This means the game is done, submissions and new players are rejected. By this point, it should be converted to a **dryGame**
+> This means the game is done, submissions and new players are rejected. By this point, it should be converted to a **Past Game**
 
-## Dry Game
-> Thats just the name I came up with for a game that has already been played and should be stored in the history. This is the type that is stored in the mongodb database. We can change this if it is too confusing.
+> __An Active Game is automatically converted to a past game once the time has run out!__ The active game won't be cleared until a new game has been created, or the server has restarted. (We could change this since theres really no good reason to do this, but no bad reason to not)
+
+## Past Game
+> A past game is a game that is stored in the MongoDB database. It contains the names of who played and their scores, the date the game played, and then the topic. Everything else is stripped. 
 =======

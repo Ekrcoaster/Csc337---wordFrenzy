@@ -7,6 +7,9 @@
 const GAME = require("./game");
 GAME.Start();
 
+const DATABASE = require("./database");
+exports.DATABASE = DATABASE;
+
 // --------------
 //   THE SERVER
 // --------------
@@ -34,7 +37,9 @@ function handleLockedPage(req, res, next) {
     next();
 }
 
-// active game requests
+// ------------------------
+//   Active Game Requests
+// ------------------------
 
 // todo, allow game settings to be created
 app.post("/activeGame/createGame", (req, res) => {
@@ -58,10 +63,16 @@ app.post("/activeGame/submit", (req, res) => {
 });
 
 
-// --------------
-// THE DATABASE
-// --------------
+// ------------------------
+//    Past Game Requests
+// ------------------------
 
+app.get("/pastGames/get/:USERNAME", (req, res) => {
+    DATABASE.GetPastGames(req.params.USERNAME).then((games) => {
+        res.json({games: games});
+    }).catch((err) => {
+        res.json({error: err}); 
+    });
 const mongoose = require("mongoose");
 const mongoDBURL = "mongodb://127.0.0.1:27017/wordFrenzy";
 mongoose.connect(mongoDBURL);
