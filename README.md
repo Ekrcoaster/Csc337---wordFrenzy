@@ -1,6 +1,20 @@
 # Welcome to Word Frenzy
 To avoid conflicts, we should each work in our own branch, then merge once the feature we are working on is done
 
+## Server:
+`server.js`
+> This is the express server that handles requests. Try to avoid writing code here, instead put it in **game.js** or **database.js**
+
+`game.js`
+> this is the code that handles active games. To export a value to be used in server.js, use exports.YOUR_VAR_NAME = ...
+
+> Then, in the server.js, use GAME.YOUR_VAR_NAME...
+
+`database.js`
+> Any interaction with the database should be put here! To export a variable or method, use exports.YOUR_VAR_NAME = ...
+
+> Then, in the server.js, use DATABASE.YOUR_VAR_NAME...
+
 ## API Usage:
 ### Active Game
 
