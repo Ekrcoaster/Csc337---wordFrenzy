@@ -120,7 +120,7 @@ class ActiveGame {
     getPlayerScores() {
         let players = [];
         for(let name in this.players) {
-            players.push({score: this.getPlayer(name).calculateScore(), name: name});
+            players.push({score: this.getPlayer(name).calculateScore(), name: name, submissions: this.getPlayer(name).submissions.length});
         }
         players.sort((a, b) => b.score - a.score);
         return players;
@@ -254,7 +254,7 @@ exports.GetGame = () => {
 exports.Submit = (name, submission) => {
     if(ACTIVE_GAME == null) return {error: "No game exists"};
     let result = ACTIVE_GAME.sendSubmission(name, submission);
-    if(result == null) return {ok: true};
+    if(result == null) return {ok: true, game: exports.GetGame()};
     return {error: result}
 }
 

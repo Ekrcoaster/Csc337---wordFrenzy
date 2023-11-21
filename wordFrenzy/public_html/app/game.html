@@ -1,15 +1,36 @@
-<!-- Name:  -->
-<!-- Class: Csc337 -->
-<!-- Purpose: This is the main HTML for the game page of word frenzy -->
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Word Frenzy - Game</title>
+        <title>Word Frenzy</title>
         <meta charset="UTF-8">
-        <link href="./style.css" type="text/css" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="game.css">
+        <script src="game.js"></script>
     </head>
     <body>
-        This is the game page, the one where you actually play the game
+        <div id="pageTitle">Word Frenzy</div>
+        <div id="playerSide">
+            <br><br>
+            <div id="playerName">Player 1</div>
+            <div id="playerScore">Score: 0</div>
+            <div id="playerGuesses">Guesses: 0</div>
+            <br><br>
+            <input id="playerGuess" type="text">
+            <button id="guessWord" onclick="sendSubmission();">GUESS</button>
+            <div id="playerProfile" class="profilePic">.png</div>
+        </div>
+        <div id="wordDisplay">
+            <div id="category">List car brands</div>
+            <div id="timer">Time: 00:00</div>
+            <div id="submissionDisplay">
+                
+            </div>
+        </div>
+        <div id="opponentSide">
+            <br><br>
+            <div id="opponentName">Player 2</div>
+            <div id="opponentScore">Score: 0</div>
+            <div id="opponentGuesses">Guesses: 0</div>
+            <div id="opponentProfile" class="profilePic">.png</div>
+        </div>
     </body>
 </html>
