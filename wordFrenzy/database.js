@@ -54,3 +54,14 @@ exports.GetPastGames = function(username) {
         })
     });
 }
+
+// define the game category data structure for a round of gameplay
+const categorySceme = new mongoose.Schema({
+    title: String,
+    description: String,
+	words: [String],
+	points: [Number]
+});
+const Category = mongoose.model("Category", categorySceme);
+
+exports.Category = Category;

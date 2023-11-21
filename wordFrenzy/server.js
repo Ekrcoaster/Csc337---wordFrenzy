@@ -73,28 +73,16 @@ app.get("/pastGames/get/:USERNAME", (req, res) => {
     }).catch((err) => {
         res.json({error: err}); 
     });
-const mongoose = require("mongoose");
-const mongoDBURL = "mongodb://127.0.0.1:27017/wordFrenzy";
-mongoose.connect(mongoDBURL);
-mongoose.connection.on('error', () => {
-    console.log('Connection Error')
-});
-mongoose.connection.on("open", () => {
-    console.log("Database Connected");
 });
 
-// define the game category data structure for a round of gameplay
-const categorySceme = new mongoose.Schema({
-    title: String,
-    description: String,
-	words: [String],
-	points: [Number]
-});
-const Category = mongoose.model("Category", categorySceme);
+
+// ------------------------
+//    Category equests
+// ------------------------
 
 // creates a category
 app.post("/create/category", function(req, res) {
-  let newCategory = new Category;
+  let newCategory = new DATABASE.Category;
 
   newCategory.title = req.body.cTitle;
   newCategory.description = req.body.cDescription;
@@ -126,7 +114,7 @@ app.post("/create/category", function(req, res) {
 
 // gets all the categories in the database
 app.get('/get/categories', function (req, res) {
-  let p = Category.find({}).exec();
+  let p = new DATABASE.Category.find({}).exec();
   p.then((response) => {
 	let html = "";
 	if (response.length != 0) {
@@ -144,18 +132,21 @@ app.get('/get/categories', function (req, res) {
 
 // gets all the words in a specific category
 app.get('/get/words/:category', function (req, res) {
-  let p = Category.find({ title : req.params.category }).exec();
+  let p = new DATABASE.Category.find({ title : req.params.category }).exec();
+  
   p.then((response) => {
-	let html = "";
-	let words = response[0].words;
-	let points = response[0].points;
-	for (var i = 0; i < words.length; i++) {
-	  html += '<p class="words">' + words[i] + ': ' + points[i] + ' points' +  '</p>';
+    let html = "";
+    let words = response[0].words;
+    let points = response[0].points;
+    for (var i = 0; i < words.length; i++) {
+      html += '<p class="words">' + words[i] + ': ' + points[i] + ' points' +  '</p>';
     }
     res.end(html);
   });
+
   p.catch( (error) => {
     console.log(error);
     res.end('Get Words Fail');
   });
+
 });
