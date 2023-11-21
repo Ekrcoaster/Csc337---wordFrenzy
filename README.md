@@ -24,6 +24,9 @@ To avoid conflicts, we should each work in our own branch, then merge once the f
 
 ### Past Games
 
+`/pastGames/get/:USERNAME` (get)
+> This will fetch all of the past games for a given user
+
 ## Active Game
 The game has a few different states:
 
