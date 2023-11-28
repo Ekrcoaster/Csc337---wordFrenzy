@@ -269,8 +269,9 @@ exports.AddPlayer = (name) => {
 exports.StartGame = () => {
     if(ACTIVE_GAME == null) return {error: "No game exists!"};
     if(ACTIVE_GAME.state != "waitingRoom") return {error: "Game is not in waiting room"};
+    if(Object.keys(ACTIVE_GAME.players).length != 2) return {error: "You need 2 players!"};
     ACTIVE_GAME.setState("playing");
-    return {ok: true}
+    return {ok: true, game: exports.GetGame()}
 }
 
 exports.CreateGame = () => {
@@ -299,5 +300,5 @@ exports.CreateGame = () => {
         });
     });
 
-    return {ok: true}
+    return {ok: true, game: exports.GetGame()}
 }
