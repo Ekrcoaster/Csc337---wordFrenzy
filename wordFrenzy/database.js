@@ -65,3 +65,7 @@ const categorySceme = new mongoose.Schema({
 const Category = mongoose.model("Category", categorySceme);
 
 exports.Category = Category;
+
+exports.GetCustomCategories = function() {
+    return Category.find({});
+}

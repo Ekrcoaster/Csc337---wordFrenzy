@@ -275,30 +275,39 @@ exports.StartGame = () => {
 }
 
 exports.CreateGame = () => {
+    
+    return new Promise((resolve, reject) => {
+        SERVER.DATABASE.GetCustomCategories().then((categories) => {
+            // allow overriding the current game IF it is safe to destroy
+            if(ACTIVE_GAME != null) {
+                if(ACTIVE_GAME.isSafeToDestroy())
+                    console.log("Overriding the old active game for new one. This is ok!");
+                else
+                    return reject("Game already exists, you should delete it");
+            }
 
-    // allow overriding the current game IF it is safe to destroy
-    if(ACTIVE_GAME != null) {
-        if(ACTIVE_GAME.isSafeToDestroy())
-            console.log("Overriding the old active game for new one. This is ok!");
-        else
-            return {error: "Game already exists, you should delete it"};
-    }
+            // create a new game with the possible game sets
+            ACTIVE_GAME = new ActiveGame([...POSSIBLE_GAME_SETS, ...convertDatabaseCategoriesToRuleSets(categories)], (game) => {
+                console.log(`-----\nGame Over! Here is the past game:`);
+                console.log(JSON.stringify(game.getAsPastGame()));
+                console.log("Converting to a past game...");
+                console.log("-----");
 
-    // create a new game with the possible game sets
-    ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS, (game) => {
-        console.log(`-----\nGame Over! Here is the past game:`);
-        console.log(JSON.stringify(game.getAsPastGame()));
-        console.log("Converting to a past game...");
-        console.log("-----");
+                // convert to past game
+                SERVER.DATABASE.ConvertActiveGame(game).then((pastGame) => {
+                    game.hasBeenSavedToPastGame = true;
+                    console.log("Successfully converted active game to past game! Active game is safe to destroy!");
+                }).catch((err) => {
+                    console.error("Error converting active game to past game:", err);
+                });
+            });
 
-        // convert to past game
-        SERVER.DATABASE.ConvertActiveGame(game).then((pastGame) => {
-            game.hasBeenSavedToPastGame = true;
-            console.log("Successfully converted active game to past game! Active game is safe to destroy!");
-        }).catch((err) => {
-            console.error("Error converting active game to past game:", err);
-        });
+            resolve({ok: true, game: exports.GetGame()});
+        }).catch((err) => reject);
     });
+}
 
-    return {ok: true, game: exports.GetGame()}
+function convertDatabaseCategoriesToRuleSets(categories) {
+    console.log(categories);
+    return [];
 }
