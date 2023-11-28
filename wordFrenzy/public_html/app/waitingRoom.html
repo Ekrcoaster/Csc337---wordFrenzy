@@ -1,4 +1,4 @@
-<!-- Name:  -->
+<!-- Name: Ethan Rees -->
 <!-- Class: Csc337 -->
 <!-- Purpose: This is the main HTML for the waiting room! -->
 
@@ -12,15 +12,19 @@
     </head>
     <body>
 
-        <h1>Waiting Room</h1>
-        <p>Players can login and join! Once ready, press start!</p>
-
-        <h3>Connected Players:</h3>
-        <div id="connectedPlayers">
-            
+        <div id="header">
+            <h1>Waiting Room</h1>
+            <p>Players can login and join! Once ready, press start!</p>
         </div>
+        <div id="roomSpace">
+            <h3>Connected Players:</h3>
+            <div id="connectedPlayers">
+                
+            </div>
+            <button id="startGame">Start Game</button>
+            <p id="errorStartGame" class="error">ERROR: ascaksjncnaknsknkn aksnc ksa</p>
 
-        <button id="startGame">Start Game</button>
+        </div>
 
         <script src="./waitingRoom.js"></script>
     </body>
