@@ -210,7 +210,7 @@ class ActiveGameRuleSet {
 
         if(this.mode == "allowedWords") {
             let index = this.allowedWords.indexOf(submission);
-            if(index == 0) return 0;
+            if(index == -1) return 0;
 
             // give 1 point if no points were assigned
             if(this.allowedWordsPoints == 0) return 1;
