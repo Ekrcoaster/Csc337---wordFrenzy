@@ -64,8 +64,19 @@ const categorySceme = new mongoose.Schema({
 });
 const Category = mongoose.model("Category", categorySceme);
 
-exports.Category = Category;
+exports.GetCustomCategories = function(searchParams = {}) {
+    return Category.find(searchParams);
+}
 
-exports.GetCustomCategories = function() {
-    return Category.find({});
+exports.CreateCategory = function(title, description, words, points) {
+    let newCategory = new Category;
+
+    newCategory.title = title;
+    newCategory.description = description;
+    
+    newCategory.words = words;
+    newCategory.points = points;
+    
+    // saves this new category to the databse
+    return newCategory.save();
 }

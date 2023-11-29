@@ -27,7 +27,7 @@ class ActiveGame {
     gameOverAt;
     gameStartedAt;
 
-    /**@type {{name: String, submission: String}[]} */
+    /**@type {{name: String, submission: String, points: Number}[]} */
     submissions = [];
 
     /**@type {GameCompleteCallback} */
@@ -100,15 +100,16 @@ class ActiveGame {
         if(this.isTimeUp()) this.setState("done");
         if(this.state != "playing") return "Game hasn't started / Game has ended";
 
-        if(!this.ruleSet.doesMatch(submission))
+        let points = this.ruleSet.doesMatch(submission);
+        if(points == 0)
             return "Invalid submission! Try again!";
 
         let player = this.getPlayer(playerName);
         if(player == null) return "Player is null! Can't find: " + playerName;
 
         // add the submissions
-        player.submissions.push(submission);
-        this.submissions.push({"name": playerName, "submission": submission});
+        player.submissions.push({"submission": submission, "points": points});
+        this.submissions.push({"name": playerName, "submission": submission, "points": points});
         
         return null;
     }
@@ -145,6 +146,7 @@ class ActiveGame {
  */
 class ActivePlayer {
     name = "";
+    /**@type {{submission: String, points: Number}[]} */
     submissions = [];
 
     constructor(name) {
@@ -152,7 +154,10 @@ class ActivePlayer {
     }
 
     calculateScore() {
-        return this.submissions.length * 10;
+        let c = 0;
+        for(let i = 0; i < this.submissions.length; i++)
+            c += this.submissions[i].points;
+        return c;
     }
 }
 
@@ -166,6 +171,7 @@ class ActiveGameRuleSet {
 
     regex;
     allowedWords = [];
+    allowedWordsPoints = [];
 
     constructor(name) {
         this.name = name;
@@ -173,6 +179,7 @@ class ActiveGameRuleSet {
 
         this.regex = null;
         this.allowedWords = [];
+        this.allowedWordsPoints = [];
     }
 
     /**
@@ -187,10 +194,11 @@ class ActiveGameRuleSet {
     /**
      * This will set the active set to allowed words
      */
-    setAllowedWords(words = []) {
+    setAllowedWords(words = [], points = []) {
         this.mode = "allowedWords";
         // convert to lowercase so we can ignore case
         this.allowedWords = words.map((x) => x.toLowerCase());
+        this.allowedWordsPoints = points.map((x) => {return x;});
         return this;
     }
 
@@ -198,13 +206,21 @@ class ActiveGameRuleSet {
         submission = submission.toLowerCase().trim();
 
         if(this.mode == "regex")
-            return submission.match(this.regex) != null;
+            return submission.match(this.regex) == null ? 0 : 1;
 
-        if(this.mode == "allowedWords")
-            return this.allowedWords.indexOf(submission) > -1;
+        if(this.mode == "allowedWords") {
+            let index = this.allowedWords.indexOf(submission);
+            if(index == 0) return 0;
+
+            // give 1 point if no points were assigned
+            if(this.allowedWordsPoints == 0) return 1;
+            
+            // otherwise get the closests point value for this index
+            return this.allowedWordsPoints[Math.min(this.allowedWordsPoints.length - 1, index)];
+        }
 
         console.error(`The mode ${this.mode} hasn't been implemented yet!`);
-        return false;
+        return 0;
     }
 }
 
@@ -308,6 +324,10 @@ exports.CreateGame = () => {
 }
 
 function convertDatabaseCategoriesToRuleSets(categories) {
-    console.log(categories);
-    return [];
+    let rules = [];
+    for(let i = 0; i < categories.length; i++) {
+        rules.push(new ActiveGameRuleSet(categories[i].title).setAllowedWords(categories[i].words, categories[i].points));
+    }
+    console.log(rules);
+    return rules;
 }
