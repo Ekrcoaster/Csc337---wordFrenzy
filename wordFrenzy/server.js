@@ -34,7 +34,20 @@ app.listen(port, () => {
  * This function will check if the person is logged in to access
  */
 function handleLockedPage(req, res, next) {
-  next();
+  let c = req.cookies;
+  console.log('auth request:');
+  console.log(req.cookies);
+  if (Object.keys(c).length != 0) {
+    if (sessions[c.login.username] != undefined &&
+      sessions[c.login.username].id == c.login.sessionID) {
+      next();
+    } else {
+      res.redirect('index.html');
+    }
+  } else {
+    console.log('here');
+    res.redirect('index.html');
+  }
 }
 
 // ------------------------

@@ -3,6 +3,9 @@
  * Course: Csc 337
  * Purpose: This is the code for the login page
  */
+const DATABASE = require("./database");
+exports.DATABASE = DATABASE;
+
 document.addEventListener('DOMContentLoaded', function () {
     const loginForm = document.getElementById('loginForm');
     const createAccountForm = document.getElementById('createAccountForm');
