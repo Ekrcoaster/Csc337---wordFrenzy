@@ -20,7 +20,7 @@ function login() {
 
     }).then((text) => {
         if (text.startsWith('SUCCESS')) {
-            window.location.href = '/app/waitingRoom.html';
+            window.location.href = '/app/home.html';
         } else {
             alert('failed - ' + text);
         }

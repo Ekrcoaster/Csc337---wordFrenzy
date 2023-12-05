@@ -255,7 +255,6 @@ exports.Start = () => {
 //exports.Start();
 
 exports.GetGame = () => {
-    if(ACTIVE_GAME == null) return {error: "No game exists"};
     return {
         state: ACTIVE_GAME.state,
         gameOverAt: ACTIVE_GAME.gameOverAt,
