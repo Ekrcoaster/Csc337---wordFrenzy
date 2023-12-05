@@ -10,32 +10,72 @@ GAME.Start();
 const DATABASE = require("./database");
 exports.DATABASE = DATABASE;
 
+
 // --------------
 //   THE SERVER
 // --------------
 const express = require("express");
-const app = express();
-const port = 5001;
-
 const bodyParser = require('body-parser');
 const cookieParser = require("cookie-parser");
 
+let sessions = {};
+
+function addSession(username) {
+  let sid = Math.floor(Math.random() * 1000000000);
+  let now = Date.now();
+  sessions[username] = { id: sid, time: now };
+  return sid;
+}
+
+function removeSessions() {
+  let now = Date.now();
+  let usernames = Object.keys(sessions);
+  for (let i = 0; i < usernames.length; i++) {
+    let last = sessions[usernames[i]].time;
+    //20 min
+    if (last + 1200000 < now) {
+      delete sessions[usernames[i]];
+    }
+  }
+  console.log(sessions);
+}
+
+setInterval(removeSessions, 2000);
+
+const app = express();
+const port = 5001;
+
 app.use(bodyParser.json());
-//app.use(cookieParser);
+app.use(cookieParser());
+app.use(express.json());
 app.use("/app/*", handleLockedPage);
 app.use(express.static(__dirname + "/public_html/"));
 app.use(express.static(__dirname + "/testing/"));
 
 app.listen(port, () => {
-    console.log(`Server started at port ${port}!`);
+  console.log(`Server started at port ${port}!`);
 });
 
 /**
  * This function will check if the person is logged in to access
  */
 function handleLockedPage(req, res, next) {
-    next();
+  let c = req.cookies;
+  console.log('auth request:');
+  console.log(req.cookies);
+  if (c != undefined) {
+    if (sessions[c.login.username] != undefined &&
+      sessions[c.login.username].id == c.login.sessionID) {
+      next();
+    } else {
+      res.redirect('/index.html');
+    }
+  } else {
+    res.redirect('/index.html');
+  }
 }
+
+
 
 // ------------------------
 //   Active Game Requests
@@ -43,23 +83,23 @@ function handleLockedPage(req, res, next) {
 
 // todo, allow game settings to be created
 app.post("/activeGame/createGame", (req, res) => {
-    res.json(GAME.CreateGame());
+  res.json(GAME.CreateGame());
 });
 
 app.post("/activeGame/addPlayer", (req, res) => {
-    res.json(GAME.AddPlayer(req.body.username));
+  res.json(GAME.AddPlayer(req.body.username));
 });
 
 app.post("/activeGame/start", (req, res) => {
-    res.json(GAME.StartGame());
+  res.json(GAME.StartGame());
 });
 
 app.get("/activeGame/getGame", (req, res) => {
-    res.json(GAME.GetGame());
+  res.json(GAME.GetGame());
 });
 
 app.post("/activeGame/submit", (req, res) => {
-    res.json(GAME.Submit(req.body.username, req.body.submission));
+  res.json(GAME.Submit(req.body.username, req.body.submission));
 });
 
 
@@ -68,11 +108,11 @@ app.post("/activeGame/submit", (req, res) => {
 // ------------------------
 
 app.get("/pastGames/get/:USERNAME", (req, res) => {
-    DATABASE.GetPastGames(req.params.USERNAME).then((games) => {
-        res.json({games: games});
-    }).catch((err) => {
-        res.json({error: err}); 
-    });
+  DATABASE.GetPastGames(req.params.USERNAME).then((games) => {
+    res.json({ games: games });
+  }).catch((err) => {
+    res.json({ error: err });
+  });
 });
 
 
@@ -81,7 +121,7 @@ app.get("/pastGames/get/:USERNAME", (req, res) => {
 // ------------------------
 
 // creates a category
-app.post("/create/category", function(req, res) {
+app.post("/create/category", function (req, res) {
 
   let words = [];
   let points = [];
@@ -90,7 +130,7 @@ app.post("/create/category", function(req, res) {
   for (var i = 0; i < array.length; i++) {
     if (i % 2 == 0) {
       words.push(array[i]);
-    } else { points.push(parseInt(array[i]))};
+    } else { points.push(parseInt(array[i])) };
   }
 
   DATABASE.CreateCategory(req.body.cTitle, req.body.cDescription, words, points).then((response) => {
@@ -109,10 +149,10 @@ app.get('/get/categories', function (req, res) {
     let html = "";
     if (response.length != 0) {
       for (var i = 0; i < response.length; i++) {
-        html += '<button class="categories" onclick="displayWords(this)" name="'+response[i].title+'">' + response[i].title + '</button>';
+        html += '<button class="categories" onclick="displayWords(this)" name="' + response[i].title + '">' + response[i].title + '</button>';
       }
     }
-      res.end(html);
+    res.end(html);
   }).catch((error) => {
     console.log(error);
     res.end('Get Categories Fail');
@@ -121,87 +161,67 @@ app.get('/get/categories', function (req, res) {
 
 // gets all the words in a specific category
 app.get('/get/words/:category', function (req, res) {
-  DATABASE.GetCustomCategories({ title : req.params.category }).then((response) => {
+  DATABASE.GetCustomCategories({ title: req.params.category }).then((response) => {
     let html = "";
     let words = response[0].words;
     let points = response[0].points;
     for (var i = 0; i < words.length; i++) {
-      html += '<p class="words">' + words[i] + ': ' + points[i] + ' points' +  '</p>';
+      html += '<p class="words">' + words[i] + ': ' + points[i] + ' points' + '</p>';
     }
     res.end(html);
   }).catch((error) => {
     console.log(error);
     res.end('Get Words Fail');
+  })
+});
+
+// ------------------------
+//    Login requests
+// ------------------------
+
+User = DATABASE.GetUserObj();
+
+app.post('/account/login', (req, res) => {
+  console.log(sessions);
+  let u = req.body;
+  let p1 = User.find({ username: u.username, password: u.password }).exec();
+  p1.then((results) => {
+    if (results.length == 0) {
+      res.end('Coult not find account');
+    } else {
+      let sid = addSession(u.username);
+      res.cookie("login",
+        { username: u.username, sessionID: sid },
+        { maxAge: 60000 * 2 });
+      res.end('SUCCESS');
+    }
   });
 });
 
-// deletes a word from a category
-app.get('/delete/words/:category/:word', function (req, res) {
-  let p = Category.find({ title : req.params.category }).exec();
-  p.then((response) => {
-	let word = req.params.word;
-	let words = response[0].words;
-	if (words.indexOf(word) > -1) {
-		words = words.filter(function(v) {
-			return v !== word;
-		});
-  
-		response[0].words = words;
-  
-	    let p = response[0].save();
-	    p.then(() => {
-		  console.log('Saved successfully');
-	    });
-	    p.catch((error) => {
-		  console.log('Save failed');
-		  console.log(error);
-	    });
-		res.end('Word Removed');
-	
-	} else {
-		res.end('Word Not In Category');
-	}
+app.get('/account/create/:user/:pass', (req, res) => {
+  let p1 = User.find({ username: req.params.user }).exec();
+  p1.then((results) => {
+    if (results.length == 0) {
+      let u = new User({
+        username: req.params.user,
+        password: req.params.pass
+      });
+      let p = u.save();
+      p.then(() => {
+        res.end('USER CREATED');
+      });
+      p.catch(() => {
+        res.end('DATABASE SAVE ISSUE');
+      });
+    } else {
+      res.end('USERNAME ALREADY TAKEN');
+    }
   });
-  p.catch( (error) => {
-    console.log(error);
-    res.end('Get Category Fail');
-  });
+
 });
 
-// adds a word to a category
-app.get('/add/words/:category/:word', function (req, res) {
-  let p = Category.find({ title : req.params.category }).exec();
-  p.then((response) => {
-	let word = req.params.word;
-	let words = response[0].words;
-	
-	words.push(word);
-	response[0].words = words;
-
-	let p = response[0].save();
-	p.then(() => {
-	  console.log('Saved successfully');
-	});
-	p.catch((error) => {
-	  console.log('Save failed');
-	  console.log(error);
-	});
-	res.end('Word Added');
-  });
-  p.catch( (error) => {
-    console.log(error);
-    res.end('Get Category Fail');
-  });
-});
-
-// deletes a category
-app.get('/delete/:category', function (req, res) {
-  let p = Category.findOneAndDelete({ title : req.params.category }).exec();
-  p.then((response) => {
-	console.log("Category Deleted");
-  });
-  p.catch( (error) => {
-    console.log(error);
-    res.end('Get Category Fail');
+app.get('/account/getName', (req, res) => {
+  let name = req.cookies.login;
+  res.send(name);
   });
 });

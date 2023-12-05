@@ -21,22 +21,22 @@ mongoose.connection.on("open", () => {
 
 const pastGameSceme = new mongoose.Schema({
     timePlayedAt: Number,
-    scores: [{name: String, score: Number}],
+    scores: [{ name: String, score: Number }],
     ruleSet: String
 });
 const PastGame = mongoose.model("PastGame", pastGameSceme);
 
 /**@param {ActiveGame} activeGame */
-exports.ConvertActiveGame = function(activeGame) {
+exports.ConvertActiveGame = function (activeGame) {
     return new Promise((resolve, reject) => {
-        if(activeGame == null) {
+        if (activeGame == null) {
             reject("Active Game is Null!");
             return;
         }
 
         // get the past game object then plug it into the database
         let game = new PastGame(activeGame.getAsPastGame());
-        
+
         game.save().then((game) => {
             resolve(game);
         }).catch((err) => {
@@ -45,9 +45,9 @@ exports.ConvertActiveGame = function(activeGame) {
     });
 }
 
-exports.GetPastGames = function(username) {
+exports.GetPastGames = function (username) {
     return new Promise((resolve, reject) => {
-        PastGame.find({"scores.name": username}).then((games) => {
+        PastGame.find({ "scores.name": username }).then((games) => {
             resolve(games);
         }).catch((err) => {
             reject(err);
@@ -59,24 +59,49 @@ exports.GetPastGames = function(username) {
 const categorySceme = new mongoose.Schema({
     title: String,
     description: String,
-	words: [String],
-	points: [Number]
+    words: [String],
+    points: [Number]
 });
 const Category = mongoose.model("Category", categorySceme);
 
-exports.GetCustomCategories = function(searchParams = {}) {
+exports.GetCustomCategories = function (searchParams = {}) {
     return Category.find(searchParams);
 }
 
-exports.CreateCategory = function(title, description, words, points) {
+exports.CreateCategory = function (title, description, words, points) {
     let newCategory = new Category;
 
     newCategory.title = title;
     newCategory.description = description;
-    
+
     newCategory.words = words;
     newCategory.points = points;
-    
+
     // saves this new category to the databse
     return newCategory.save();
 }
+
+var UserSchema = new mongoose.Schema({
+    username: String,
+    password: String
+});
+var User = mongoose.model('User', UserSchema);
+exports.GetUserObj = function () {
+    return User;
+}
+exports.CreateUser = function (username, password) {
+    let newUser = new User;
+    newUser.usernaame = username;
+    newUser.password = password;
+
+    return newUser.save();
+}
+
+exports.FindUser = function (user, pass) {
+    return User.find({ username: user, password: pass })
+}
+
+exports.FindUser1 = function (user) {
+    return User.find({ username: user })
+}
+

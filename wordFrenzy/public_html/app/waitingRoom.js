@@ -13,9 +13,9 @@
  */
 var onGameUpdate = (game) => {
     // check for custom error
-    if(game != null && game?.error) {
+    if (game != null && game?.error) {
         error(game?.error);
-        if(game.error == "No game exists") {
+        if (game.error == "No game exists") {
             createGame();
             return;
         }
@@ -24,7 +24,7 @@ var onGameUpdate = (game) => {
     }
 
     // if the game started, redirect
-    if(game.state == "playing") {
+    if (game.state == "playing") {
         location.href = "/app/game.html";
         return;
     }
@@ -42,17 +42,43 @@ setInterval(() => {
 document.getElementById("startGame").addEventListener("click", startGame);
 
 // once the page loads, get the name from the cookies and login to the game
-let name = prompt("what is your name? (thisll be replaced later with cookies)");
-fetch("/activeGame/addPlayer", {
-    "method": "POST",
-    "headers": {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    },
-    "body": JSON.stringify({
-        "username": name
-    })
-}).then((res) => res.json())
+
+async function fetchName(url) {
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        return data.username;
+    } catch (error) {
+        console.error('There was a problem fetching the name:', error);
+        return null;
+    }
+}
+
+
+async function init() {
+    try {
+        let name = await fetchName('/account/getName');
+        fetch("/activeGame/addPlayer", {
+            "method": "POST",
+            "headers": {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            "body": JSON.stringify({
+                "username": name
+            })
+        }).then((res) => res.json()) // Now this runs after the name is fetched
+    } catch (error) {
+        console.error('Error in init:', error);
+    }
+}
+
+init();
 
 /**
  * This function will ask the server for an update to the game, and provides
@@ -60,8 +86,8 @@ fetch("/activeGame/addPlayer", {
  */
 function updateGame(callback) {
     fetch("/activeGame/getGame").then((res => res.json()))
-    .then((game) => callback(game))
-    .catch((err) => console.error(err));
+        .then((game) => callback(game))
+        .catch((err) => console.error(err));
 }
 
 /**
@@ -81,11 +107,11 @@ function createGame() {
         "body": JSON.stringify({
         })
     }).then((res) => res.json())
-    .then((res) => {
-        onGameUpdate(res.game);
-    }).catch((err) => {
-        console.error(err);
-    });
+        .then((res) => {
+            onGameUpdate(res.game);
+        }).catch((err) => {
+            console.error(err);
+        });
 }
 
 /**
@@ -102,12 +128,12 @@ function startGame() {
         "body": JSON.stringify({
         })
     }).then((res) => res.json())
-    .then((res) => {
-        if(res.error) error(res.error);
-        else onGameUpdate(res.game);
-    }).catch((err) => {
-        error(err);
-    });
+        .then((res) => {
+            if (res.error) error(res.error);
+            else onGameUpdate(res.game);
+        }).catch((err) => {
+            error(err);
+        });
 }
 
 /**
@@ -116,7 +142,7 @@ function startGame() {
  */
 function buildConnectedPlayers(players) {
     let html = "";
-    for(let i = 0; i < players.length; i++) {
+    for (let i = 0; i < players.length; i++) {
         html += `<div class="playerItem">
 
             ${players[i]}
