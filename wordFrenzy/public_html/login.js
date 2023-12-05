@@ -6,42 +6,21 @@
 const DATABASE = require("./database");
 exports.DATABASE = DATABASE;
 
-document.addEventListener('DOMContentLoaded', function () {
-    const loginForm = document.getElementById('loginForm');
-    const createAccountForm = document.getElementById('createAccountForm');
-
-    if (loginForm) {
-        loginForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            login();
-        });
-    }
-
-    if (createAccountForm) {
-        createAccountForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            createAccount();
-        });
-    }
-});
-
 function login() {
     let us = document.getElementById('usernameLogin').value;
     let pw = document.getElementById('passwordLogin').value;
     let data = { username: us, password: pw };
-    let p = fetch('/activeGame/login/', {
+    let p = fetch('/account/login/', {
         method: 'POST',
         body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include'
+        headers: { "Content-Type": "application/json" }
     });
     p.then((response) => {
         return response.text();
+
     }).then((text) => {
-        console.log(text);
         if (text.startsWith('SUCCESS')) {
-            sessionStorage.setItem('username', data.username);
-            window.location.href = 'app/game.html';
+            window.location.href = '/app/waitingRoom.html';
         } else {
             alert('failed');
         }
@@ -51,7 +30,7 @@ function login() {
 function createAccount() {
     let us = document.getElementById('usernameCreate').value;
     let pw = document.getElementById('passwordCreate').value;
-    let p = fetch('/activeGame/addPlayer' + us + '/' + encodeURIComponent(pw));
+    let p = fetch('/account/create/' + us + '/' + encodeURIComponent(pw));
     p.then((response) => {
         return response.text();
     }).then((text) => {

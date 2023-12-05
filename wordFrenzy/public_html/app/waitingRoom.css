@@ -1,0 +1,67 @@
+/**
+ * Authors: Ethan Rees
+ * Course: Csc 337
+ * Purpose: This is the exclusive css for the results page
+ */
+
+h1 {
+    text-align: center;
+    font-size: 55px;
+    margin: 0px;
+}
+
+#header {
+    border: 3px solid rgb(218, 67, 67);
+    padding-bottom: 15px;
+}
+
+#header p {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.377);
+    margin: 0px;
+    font-size: 20px;
+}
+
+h3 {
+    text-align: center;
+    font-size: 35px;
+    margin: 20px 0px 0px 0px;
+}
+
+#roomSpace {
+    border: 3px solid rgb(218, 67, 67);
+}
+
+#connectedPlayers {
+    text-align: center;
+    border: 0px;
+    border-radius: 5px;
+    border-left: 2px dashed rgb(218, 67, 67);
+    border-right: 2px dashed rgb(218, 67, 67);
+    width: 40%;
+    margin: 8px auto 8px auto;
+    padding: 5px;
+}
+
+.playerItem {
+    font-size: 20px;
+    border: 0px;
+    border-radius: 5px;
+    border-left: 2px solid rgb(218, 67, 67);
+    border-right: 2px solid rgb(218, 67, 67);
+    background-color: rgba(218, 67, 67, 0.119);
+    width: 80%;
+    margin: 8px auto 8px auto;
+}
+
+button {
+    border: 0px;
+    border-radius: 5px;
+    border-left: 2px solid rgb(87, 218, 67);
+    border-right: 2px solid rgb(87, 218, 67);
+    background-color: rgba(87, 218, 67, 0.119);
+    margin: 8px auto 8px auto;
+    display: block;
+    font-size: 20px;
+    padding: 10px;
+}

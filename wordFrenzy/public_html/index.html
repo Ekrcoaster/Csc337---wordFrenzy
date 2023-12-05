@@ -2,30 +2,44 @@
 <!-- Class: Csc337 -->
 <!-- Purpose: This is the main HTML for the login page of word frenzy -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>Word Frenzy - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="/login.js"></script>
+    <link type="text/css" rel="stylesheet" href="index.css">
+    <title>WORD FRENZY - LOGIN</title>
 </head>
 
 <body>
-    <h2>Login</h2>
-    <form id="loginForm">
-        <input type="text" id="usernameLogin" placeholder="Username" required>
-        <input type="password" id="passwordLogin" placeholder="Password" required>
-        <button type="submit">Log In</button>
-    </form>
 
-    <h2>Create an Account</h2>
-    <form id="createAccountForm">
-        <input type="text" id="usernameCreate" placeholder="Username" required>
-        <input type="password" id="passwordCreate" placeholder="Password" required>
-        <button type="submit">Create Account</button>
-    </form>
+    <div class="segment" id="responsibilities">
+        <h2>Welcome to Word Frenzy!</h2>
+    </div>
 
-    <script src="script.js"></script>
+    <div class="login">
+        <div>LOG IN</div>
+        <label for="usernameLogin">Username</label>
+        <input id="usernameLogin" type="text"> </input>
+        <br />
+        <label for="passwordLogin">Password</label>
+        <input id="passwordLogin" type="password"> </input>
+        <br />
+        <input type="button" onclick="login();" value="Log in" />
+    </div>
+
+    <br />
+
+    <div class="create-account">
+        <div>CREATE AN ACCOUNT</div>
+        <label for="usernameCreate">Username</label>
+        <input id="usernameCreate" type="text"> </input>
+        <br />
+        <label for="passwordCreate">Password</label>
+        <input id="passwordCreate" type="password"> </input>
+        <br />
+        <input type="button" onclick="createAccount();" value="Create Account" />
+    </div>
+
 </body>
 
-</html>s
+</html>

@@ -1,0 +1,76 @@
+/* Reset and basic styles */
+* {
+    box-sizing: border-box;
+    font-family: "Caveat", cursive;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(51, 42, 48);
+    color: rgb(94, 163, 56);
+}
+
+/* Segment styling */
+.segment {
+    border: 5px solid rgb(94, 163, 56);
+    text-align: center;
+    padding: 20px;
+    margin: 20px;
+}
+
+/* Input and label styling */
+input[type="text"],
+input[type="password"] {
+    border: 2px solid rgb(94, 163, 56);
+    background-color: transparent;
+    color: rgb(94, 163, 56);
+    padding: 10px;
+    margin: 10px 0;
+}
+
+label {
+    color: rgb(94, 163, 56);
+}
+
+/* Button styling */
+button {
+    background-color: rgb(94, 163, 56);
+    color: rgb(51, 42, 48);
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: rgb(51, 42, 48);
+    color: rgb(94, 163, 56);
+    border: 2px solid rgb(94, 163, 56);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .segment {
+        margin: 10px;
+    }
+}
+
+/* Centering and border for login and create account divs */
+.login,
+.create-account {
+    border: 2px solid rgb(94, 163, 56);
+    /* Adding border */
+    margin: auto;
+    /* Centering horizontally */
+    width: fit-content;
+    /* Adjust width to fit content */
+    padding: 20px;
+    /* Adding some padding */
+    text-align: center;
+    /* Center text inside the div */
+}
+
+/* add some space between the login and create account sections */
+.login+.create-account {
+    margin-top: 20px;
+}

@@ -64,9 +64,44 @@ const categorySceme = new mongoose.Schema({
 });
 const Category = mongoose.model("Category", categorySceme);
 
-var userSchema = new Schema({
+exports.GetCustomCategories = function (searchParams = {}) {
+    return Category.find(searchParams);
+}
+
+exports.CreateCategory = function (title, description, words, points) {
+    let newCategory = new Category;
+
+    newCategory.title = title;
+    newCategory.description = description;
+
+    newCategory.words = words;
+    newCategory.points = points;
+
+    // saves this new category to the databse
+    return newCategory.save();
+}
+
+var UserSchema = new mongoose.Schema({
     username: String,
     password: String
 });
-const User = mongoose.model('User', userSchema);
-exports.Category = Category;
+var User = mongoose.model('User', UserSchema);
+exports.GetUserObj = function () {
+    return User;
+}
+exports.CreateUser = function (username, password) {
+    let newUser = new User;
+    newUser.usernaame = username;
+    newUser.password = password;
+
+    return newUser.save();
+}
+
+exports.FindUser = function (user, pass) {
+    return User.find({ username: user, password: pass })
+}
+
+exports.FindUser1 = function (user) {
+    return User.find({ username: user })
+}
+
