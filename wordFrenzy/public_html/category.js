@@ -4,7 +4,7 @@
  * Purpose: This is the code for the category editing page
  */
  
- // send the new category data to the server to create a new category
+// send the new category data to the server to create a new category
  document.getElementById("sendCategoryButton").addEventListener("click", () => {
     // check requirements
     if(document.getElementById("categoryTitle").value == "") {alert("Category needs a title!"); return;}
@@ -38,6 +38,7 @@
 	displayCategories();
 });
 
+let deleteCat = false;
 // displays all the categories on the webpage
 function displayCategories() {
 	fetch("/get/categories").then((response) => {
@@ -48,6 +49,7 @@ function displayCategories() {
 	}).catch((err) => {
 		alert(err);
 	});
+	deleteCat = false;
 }
 
 // displays all the words for the categories on the webpage
@@ -57,10 +59,57 @@ function displayWords(but) {
 		return response.text();
 	}).then((res) => {
 		let x =  document.getElementById("wordPosition");
-		x.innerHTML = res;
+		let html = '';
+		html += res;
+		html += '<div id="categoryButtons"><label>Input Word: </label><input id="word" type="text">';
+		html += '<button id="addWordsCategory" onclick="addWords(this)" name="'+category+'">Add Word</button>';
+		html += '<button id="deleteWordsCategory" onclick="deleteWords(this)" name="'+category+'">Delete Word</button>';
+		html += '<button id="deleteCategoryButton" onclick="deleteCategory(this)" name="'+category+'">Delete This  Category</button></div>';
+		x.innerHTML = html;
 	}).catch((err) => {
 		alert(err);
 	});
+}
+
+// deletes a word from a category
+function deleteWords(but) {
+	let x = document.getElementById("word");
+	if (x.value == "") {alert("No Word Input to Delete"); return;}
+	let category = but.name;
+	fetch("/delete/words/" + category + "/" + x.value).then((response) => {
+		console.log('Word Deleted');
+	}).catch((err) => {
+		alert(err);
+	});
+}
+
+// adds a word from a category
+function addWords(but) {
+	let x = document.getElementById("word");
+	if (x.value == "") {alert("No Word Input to Add"); return;}
+	let category = but.name;
+	fetch("/add/words/" + category + "/" + x.value).then((response) => {
+		console.log('Word Added');
+	}).catch((err) => {
+		alert(err);
+	});
+}
+
+// deletes this category
+function deleteCategory(but) {
+	if (deleteCat) {
+		let category = but.name;
+		fetch("/delete/" + category).then((response) => {
+			console.log("Category Deleted");
+		}).catch((err) => {
+			alert(err);
+		});
+		displayCategories();
+		deleteCat = false;
+	} else {
+		deleteCat = true;
+		alert("Click again if you actually want to delete category.");
+	}
 }
 
 displayCategories();

@@ -147,3 +147,74 @@ app.get('/get/words/:category', function (req, res) {
     res.end('Get Words Fail');
   });
 });
+
+// deletes a word from a category
+app.get('/delete/words/:category/:word', function (req, res) {
+  let p = Category.find({ title : req.params.category }).exec();
+  p.then((response) => {
+	let word = req.params.word;
+	let words = response[0].words;
+	if (words.indexOf(word) > -1) {
+		words = words.filter(function(v) {
+			return v !== word;
+		});
+  
+		response[0].words = words;
+  
+	    let p = response[0].save();
+	    p.then(() => {
+		  console.log('Saved successfully');
+	    });
+	    p.catch((error) => {
+		  console.log('Save failed');
+		  console.log(error);
+	    });
+		res.end('Word Removed');
+	
+	} else {
+		res.end('Word Not In Category');
+	}
+  });
+  p.catch( (error) => {
+    console.log(error);
+    res.end('Get Category Fail');
+  });
+});
+
+// adds a word to a category
+app.get('/add/words/:category/:word', function (req, res) {
+  let p = Category.find({ title : req.params.category }).exec();
+  p.then((response) => {
+	let word = req.params.word;
+	let words = response[0].words;
+	
+	words.push(word);
+	response[0].words = words;
+
+	let p = response[0].save();
+	p.then(() => {
+	  console.log('Saved successfully');
+	});
+	p.catch((error) => {
+	  console.log('Save failed');
+	  console.log(error);
+	});
+	res.end('Word Added');
+  });
+  p.catch( (error) => {
+    console.log(error);
+    res.end('Get Category Fail');
+  });
+});
+
+// deletes a category
+app.get('/delete/:category', function (req, res) {
+  let p = Category.findOneAndDelete({ title : req.params.category }).exec();
+  p.then((response) => {
+	console.log("Category Deleted");
+  });
+  p.catch( (error) => {
+    console.log(error);
+    res.end('Get Category Fail');
+  });
+});
