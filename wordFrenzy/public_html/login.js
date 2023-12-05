@@ -22,7 +22,7 @@ function login() {
         if (text.startsWith('SUCCESS')) {
             window.location.href = '/app/waitingRoom.html';
         } else {
-            alert('failed');
+            alert('failed - ' + text);
         }
     });
 }

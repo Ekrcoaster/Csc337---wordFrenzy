@@ -86,11 +86,9 @@ var UserSchema = new mongoose.Schema({
     password: String
 });
 var User = mongoose.model('User', UserSchema);
-exports.GetUserObj = function () {
-    return User;
-}
+
 exports.CreateUser = function (username, password) {
-    let newUser = new User;
+    let newUser = new User();
     newUser.usernaame = username;
     newUser.password = password;
 
@@ -101,7 +99,6 @@ exports.FindUser = function (user, pass) {
     return User.find({ username: user, password: pass })
 }
 
-exports.FindUser1 = function (user) {
+exports.FindUserJustUsername = function (user) {
     return User.find({ username: user })
 }
-

@@ -179,13 +179,10 @@ app.get('/get/words/:category', function (req, res) {
 //    Login requests
 // ------------------------
 
-User = DATABASE.GetUserObj();
-
 app.post('/account/login', (req, res) => {
   console.log(sessions);
   let u = req.body;
-  let p1 = User.find({ username: u.username, password: u.password }).exec();
-  p1.then((results) => {
+  DATABASE.FindUser(u.username, u.password).then((results) => {
     if (results.length == 0) {
       res.end('Coult not find account');
     } else {
@@ -199,18 +196,11 @@ app.post('/account/login', (req, res) => {
 });
 
 app.get('/account/create/:user/:pass', (req, res) => {
-  let p1 = User.find({ username: req.params.user }).exec();
-  p1.then((results) => {
+  DATABASE.FindUserJustUsername(req.params.user).then((results) => {
     if (results.length == 0) {
-      let u = new User({
-        username: req.params.user,
-        password: req.params.pass
-      });
-      let p = u.save();
-      p.then(() => {
+      DATABASE.CreateUser(req.params.user, req.params.pass).then(() => {
         res.end('USER CREATED');
-      });
-      p.catch(() => {
+      }).catch(() => {
         res.end('DATABASE SAVE ISSUE');
       });
     } else {
