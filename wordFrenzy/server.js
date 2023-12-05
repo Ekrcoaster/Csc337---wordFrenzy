@@ -223,5 +223,4 @@ app.get('/account/create/:user/:pass', (req, res) => {
 app.get('/account/getName', (req, res) => {
   let name = req.cookies.login;
   res.send(name);
-  });
 });
