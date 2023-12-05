@@ -254,6 +254,9 @@ exports.Start = () => {
 }
 //exports.Start();
 
+exports.GameExists = () => {
+    return ACTIVE_GAME != null;
+}
 exports.GetGame = () => {
     return {
         state: ACTIVE_GAME.state,

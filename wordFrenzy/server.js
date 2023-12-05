@@ -81,11 +81,6 @@ function handleLockedPage(req, res, next) {
 //   Active Game Requests
 // ------------------------
 
-// todo, allow game settings to be created
-app.post("/activeGame/createGame", (req, res) => {
-  res.json(GAME.CreateGame());
-});
-
 app.post("/activeGame/addPlayer", (req, res) => {
   res.json(GAME.AddPlayer(req.body.username));
 });
@@ -95,7 +90,15 @@ app.post("/activeGame/start", (req, res) => {
 });
 
 app.get("/activeGame/getGame", (req, res) => {
-  res.json(GAME.GetGame());
+  if(!GAME.GameExists()) {
+    GAME.CreateGame().then((result) => {
+      res.json(result); 
+    }).catch((err) => {
+      res.json({"error": "Failed to create game: " + err});
+    });
+  } else {
+    res.json(GAME.GetGame());
+  }
 });
 
 app.post("/activeGame/submit", (req, res) => {
