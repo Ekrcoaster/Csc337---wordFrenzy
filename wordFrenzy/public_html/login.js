@@ -3,8 +3,8 @@
  * Course: Csc 337
  * Purpose: This is the code for the login page
  */
-const DATABASE = require("./database");
-exports.DATABASE = DATABASE;
+//const DATABASE = require("./database");
+//exports.DATABASE = DATABASE;
 
 function login() {
     let us = document.getElementById('usernameLogin').value;
@@ -30,8 +30,7 @@ function login() {
 function createAccount() {
     let us = document.getElementById('usernameCreate').value;
     let pw = document.getElementById('passwordCreate').value;
-	  console.log('/activeGame/addPlayer' + us + '/' + encodeURIComponent(pw));
-    let p = fetch('/activeGame/addPlayer' + us + '/' + encodeURIComponent(pw));
+    let p = fetch('/account/create/' + us + '/' + encodeURIComponent(pw));
     p.then((response) => {
         return response.text();
     }).then((text) => {
