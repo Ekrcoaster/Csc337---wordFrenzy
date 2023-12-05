@@ -48,6 +48,7 @@ function login() {
 function createAccount() {
     let us = document.getElementById('usernameCreate').value;
     let pw = document.getElementById('passwordCreate').value;
+	console.log('/activeGame/addPlayer' + us + '/' + encodeURIComponent(pw));
     let p = fetch('/activeGame/addPlayer' + us + '/' + encodeURIComponent(pw));
     p.then((response) => {
         return response.text();

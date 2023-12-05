@@ -1,0 +1,65 @@
+* {
+    box-sizing: border-box;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-align: center;
+    color: rgb(94, 163, 56);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(51, 42, 48);
+    height: 100%;
+    width: 100%;
+}
+
+#pageTitle {
+    position: absolute;
+    border: 5px solid rgb(94, 163, 56);
+    width: 100%;
+    height: 10%;
+    font-size: 7vh;
+    text-align: center;
+    color: rgb(94, 163, 56);
+}
+
+#avatar {
+    position: absolute;
+    border: 3px solid wheat;
+    top: 10%;
+    left: 40%;
+    height: 30%;
+    width: 20%;
+}
+
+#bio {
+    position: absolute;
+    top: 45%;
+    left: 40%;
+    height: 5%;
+    font-size: 22px;
+}
+
+#favCategories {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    height: 5%;
+    font-size: 22px;
+}
+
+#record {
+    position: absolute;
+    top: 55%;
+    left: 40%;
+    height: 5%;
+    font-size: 22px;
+}
+
+#highScore {
+    position: absolute;
+    left: 40%;
+    top: 60%;
+    height: 5%;
+    font-size: 22px;
+}

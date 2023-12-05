@@ -7,6 +7,9 @@
 const GAME = require("./game");
 GAME.Start();
 
+const DATABASE = require("./database");
+exports.DATABASE = DATABASE;
+
 // --------------
 //   THE SERVER
 // --------------
@@ -21,6 +24,7 @@ app.use(bodyParser.json());
 //app.use(cookieParser);
 app.use("/app/*", handleLockedPage);
 app.use(express.static(__dirname + "/public_html/"));
+app.use(express.static(__dirname + "/testing/"));
 
 app.listen(port, () => {
     console.log(`Server started at port ${port}!`);
@@ -33,7 +37,9 @@ function handleLockedPage(req, res, next) {
     next();
 }
 
-// active game requests
+// ------------------------
+//   Active Game Requests
+// ------------------------
 
 // todo, allow game settings to be created
 app.post("/activeGame/createGame", (req, res) => {
@@ -57,92 +63,73 @@ app.post("/activeGame/submit", (req, res) => {
 });
 
 
-// --------------
-// THE DATABASE
-// --------------
+// ------------------------
+//    Past Game Requests
+// ------------------------
 
-const mongoose = require("mongoose");
-const mongoDBURL = "mongodb://127.0.0.1:27017/wordFrenzy";
-mongoose.connect(mongoDBURL);
-mongoose.connection.on('error', () => {
-    console.log('Connection Error')
-});
-mongoose.connection.on("open", () => {
-    console.log("Database Connected");
+app.get("/pastGames/get/:USERNAME", (req, res) => {
+    DATABASE.GetPastGames(req.params.USERNAME).then((games) => {
+        res.json({games: games});
+    }).catch((err) => {
+        res.json({error: err}); 
+    });
 });
 
-// define the game category data structure for a round of gameplay
-const categorySceme = new mongoose.Schema({
-    title: String,
-    description: String,
-	words: [String],
-	points: [Number]
-});
-const Category = mongoose.model("Category", categorySceme);
+
+// ------------------------
+//    Category equests
+// ------------------------
 
 // creates a category
 app.post("/create/category", function(req, res) {
-  let newCategory = new Category;
 
-  newCategory.title = req.body.cTitle;
-  newCategory.description = req.body.cDescription;
-  
   let words = [];
   let points = [];
 
   let array = req.body.cWords.split(",");
   for (var i = 0; i < array.length; i++) {
-	if (i % 2 == 0) {
-	  words.push(array[i]);
-	} else { points.push(array[i])};
+    if (i % 2 == 0) {
+      words.push(array[i]);
+    } else { points.push(parseInt(array[i]))};
   }
-  newCategory.words = words;
-  newCategory.points = points;
-  
-  // saves this new category to the databse
-  let p = newCategory.save();
-  p.then(() => {
+
+  DATABASE.CreateCategory(req.body.cTitle, req.body.cDescription, words, points).then((response) => {
     console.log('Saved successfully');
-  });
-  p.catch((error) => {
+    res.end('Category Created');
+  }).catch((error) => {
     console.log('Save failed');
     console.log(error);
+    res.end('Category Failed!');
   });
-
-  res.end('Category Created');
 });
 
 // gets all the categories in the database
 app.get('/get/categories', function (req, res) {
-  let p = Category.find({}).exec();
-  p.then((response) => {
-	let html = "";
-	if (response.length != 0) {
-		for (var i = 0; i < response.length; i++) {
-		  html += '<button class="categories" onclick="displayWords(this)" name="'+response[i].title+'">' + response[i].title + '</button>';
-		}
-	}
-    res.end(html);
-  });
-  p.catch( (error) => {
+  DATABASE.GetCustomCategories().then((response) => {
+    let html = "";
+    if (response.length != 0) {
+      for (var i = 0; i < response.length; i++) {
+        html += '<button class="categories" onclick="displayWords(this)" name="'+response[i].title+'">' + response[i].title + '</button>';
+      }
+    }
+      res.end(html);
+  }).catch((error) => {
     console.log(error);
     res.end('Get Categories Fail');
-  });
+  })
 });
 
 // gets all the words in a specific category
 app.get('/get/words/:category', function (req, res) {
-  let p = Category.find({ title : req.params.category }).exec();
-  p.then((response) => {
-	let html = "";
-	let words = response[0].words;
-	let points = response[0].points;
-	for (var i = 0; i < words.length; i++) {
-	  html += '<p class="words">' + words[i] + ': ' + points[i] + ' points' +  '</p>';
+  DATABASE.GetCustomCategories({ title : req.params.category }).then((response) => {
+    let html = "";
+    let words = response[0].words;
+    let points = response[0].points;
+    for (var i = 0; i < words.length; i++) {
+      html += '<p class="words">' + words[i] + ': ' + points[i] + ' points' +  '</p>';
     }
     res.end(html);
-  });
-  p.catch( (error) => {
+  }).catch((error) => {
     console.log(error);
     res.end('Get Words Fail');
   });

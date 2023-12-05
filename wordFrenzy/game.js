@@ -4,6 +4,8 @@
  * Purpose: This is the main serverside code for the game
  */
 
+const SERVER = require("./server");
+
 // the following are types used in vscode to help make writing js easier, they do not effect the code at all
 /**@typedef {("waitingRoom"|"playing"|"done")} ActiveGameStates */
 /**@typedef {("allowedWords"|"regex")} ActiveGameRuleSetMode */
@@ -25,11 +27,13 @@ class ActiveGame {
     gameOverAt;
     gameStartedAt;
 
-    /**@type {{name: String, submission: String}[]} */
+    /**@type {{name: String, submission: String, points: Number}[]} */
     submissions = [];
 
     /**@type {GameCompleteCallback} */
     onGameComplete;
+
+    hasBeenSavedToPastGame = false;
 
     /**@param {ActiveGameRuleSet[]} possibleRules @param {GameCompleteCallback} onGameComplete */
     constructor(possibleRules, onGameComplete) {
@@ -43,6 +47,7 @@ class ActiveGame {
         this.ruleSet = possibleRules[Math.floor(Math.random() * possibleRules.length)];
 
         this.onGameComplete = onGameComplete;
+        this.hasBeenSavedToPastGame = false;
     }
 
     addPlayer(player) {
@@ -95,15 +100,16 @@ class ActiveGame {
         if(this.isTimeUp()) this.setState("done");
         if(this.state != "playing") return "Game hasn't started / Game has ended";
 
-        if(!this.ruleSet.doesMatch(submission))
+        let points = this.ruleSet.doesMatch(submission);
+        if(points == 0)
             return "Invalid submission! Try again!";
 
         let player = this.getPlayer(playerName);
         if(player == null) return "Player is null! Can't find: " + playerName;
 
         // add the submissions
-        player.submissions.push(submission);
-        this.submissions.push({"name": playerName, "submission": submission});
+        player.submissions.push({"submission": submission, "points": points});
+        this.submissions.push({"name": playerName, "submission": submission, "points": points});
         
         return null;
     }
@@ -115,16 +121,21 @@ class ActiveGame {
     getPlayerScores() {
         let players = [];
         for(let name in this.players) {
-            players.push({score: this.getPlayer(name).calculateScore(), name: name});
+            players.push({score: this.getPlayer(name).calculateScore(), name: name, submissions: this.getPlayer(name).submissions.length});
         }
         players.sort((a, b) => b.score - a.score);
         return players;
     }
 
-    getDryGameResults() {
+    isSafeToDestroy() {
+        return this.hasBeenSavedToPastGame;
+    }
+
+    getAsPastGame() {
         return {
             id: this.id,
-            ruleSet: this.ruleSet,
+            timePlayedAt: this.gameStartedAt,
+            ruleSet: this.ruleSet.name,
             scores: this.getPlayerScores()
         }
     }
@@ -135,6 +146,7 @@ class ActiveGame {
  */
 class ActivePlayer {
     name = "";
+    /**@type {{submission: String, points: Number}[]} */
     submissions = [];
 
     constructor(name) {
@@ -142,7 +154,10 @@ class ActivePlayer {
     }
 
     calculateScore() {
-        return this.submissions.length * 10;
+        let c = 0;
+        for(let i = 0; i < this.submissions.length; i++)
+            c += this.submissions[i].points;
+        return c;
     }
 }
 
@@ -156,6 +171,7 @@ class ActiveGameRuleSet {
 
     regex;
     allowedWords = [];
+    allowedWordsPoints = [];
 
     constructor(name) {
         this.name = name;
@@ -163,6 +179,7 @@ class ActiveGameRuleSet {
 
         this.regex = null;
         this.allowedWords = [];
+        this.allowedWordsPoints = [];
     }
 
     /**
@@ -177,10 +194,11 @@ class ActiveGameRuleSet {
     /**
      * This will set the active set to allowed words
      */
-    setAllowedWords(words = []) {
+    setAllowedWords(words = [], points = []) {
         this.mode = "allowedWords";
         // convert to lowercase so we can ignore case
         this.allowedWords = words.map((x) => x.toLowerCase());
+        this.allowedWordsPoints = points.map((x) => {return x;});
         return this;
     }
 
@@ -188,13 +206,21 @@ class ActiveGameRuleSet {
         submission = submission.toLowerCase().trim();
 
         if(this.mode == "regex")
-            return submission.match(this.regex) != null;
+            return submission.match(this.regex) == null ? 0 : 1;
 
-        if(this.mode == "allowedWords")
-            return this.allowedWords.indexOf(submission) > -1;
+        if(this.mode == "allowedWords") {
+            let index = this.allowedWords.indexOf(submission);
+            if(index == -1) return 0;
+
+            // give 1 point if no points were assigned
+            if(this.allowedWordsPoints == 0) return 1;
+            
+            // otherwise get the closests point value for this index
+            return this.allowedWordsPoints[Math.min(this.allowedWordsPoints.length - 1, index)];
+        }
 
         console.error(`The mode ${this.mode} hasn't been implemented yet!`);
-        return false;
+        return 0;
     }
 }
 
@@ -205,12 +231,13 @@ var POSSIBLE_GAME_SETS = [
     new ActiveGameRuleSet("Words that rhyme with \"time\"").setAllowedWords(["crime", "rhyme"])
 ]
 
+exports.ACTIVE_GAME = ACTIVE_GAME;
 exports.Start = () => {
     return;
     // testing
     ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS, (game) => {
-        console.log(`-----\nGame Over! Here is the dry game:`);
-        console.log(JSON.stringify(game.getDryGameResults()));
+        console.log(`-----\nGame Over! Here is the past game:`);
+        console.log(JSON.stringify(game.getAsPastGame()));
         console.log("-----");
     });
     ACTIVE_GAME.addPlayer(new ActivePlayer("bob"));
@@ -234,6 +261,8 @@ exports.GetGame = () => {
         gameOverAt: ACTIVE_GAME.gameOverAt,
         submissions: ACTIVE_GAME.submissions,
         scores: ACTIVE_GAME.getPlayerScores(),
+        startedAt: ACTIVE_GAME.gameStartedAt,
+        ruleSet: ACTIVE_GAME.ruleSet.name,
         playerNames: Object.keys(ACTIVE_GAME.players)
     }
 }
@@ -241,7 +270,7 @@ exports.GetGame = () => {
 exports.Submit = (name, submission) => {
     if(ACTIVE_GAME == null) return {error: "No game exists"};
     let result = ACTIVE_GAME.sendSubmission(name, submission);
-    if(result == null) return {ok: true};
+    if(result == null) return {ok: true, game: exports.GetGame()};
     return {error: result}
 }
 
@@ -256,19 +285,49 @@ exports.AddPlayer = (name) => {
 exports.StartGame = () => {
     if(ACTIVE_GAME == null) return {error: "No game exists!"};
     if(ACTIVE_GAME.state != "waitingRoom") return {error: "Game is not in waiting room"};
+    if(Object.keys(ACTIVE_GAME.players).length != 2) return {error: "You need 2 players!"};
     ACTIVE_GAME.setState("playing");
-    return {ok: true}
+    return {ok: true, game: exports.GetGame()}
 }
 
 exports.CreateGame = () => {
-    if(ACTIVE_GAME != null) return {error: "Game already exists, you should delete it"};
+    
+    return new Promise((resolve, reject) => {
+        SERVER.DATABASE.GetCustomCategories().then((categories) => {
+            // allow overriding the current game IF it is safe to destroy
+            if(ACTIVE_GAME != null) {
+                if(ACTIVE_GAME.isSafeToDestroy())
+                    console.log("Overriding the old active game for new one. This is ok!");
+                else
+                    return reject("Game already exists, you should delete it");
+            }
 
-    // create a new game with the possible game sets
-    ACTIVE_GAME = new ActiveGame(POSSIBLE_GAME_SETS, (game) => {
-        console.log(`-----\nGame Over! Here is the dry game:`);
-        console.log(JSON.stringify(game.getDryGameResults()));
-        console.log("-----");
+            // create a new game with the possible game sets
+            ACTIVE_GAME = new ActiveGame([...POSSIBLE_GAME_SETS, ...convertDatabaseCategoriesToRuleSets(categories)], (game) => {
+                console.log(`-----\nGame Over! Here is the past game:`);
+                console.log(JSON.stringify(game.getAsPastGame()));
+                console.log("Converting to a past game...");
+                console.log("-----");
+
+                // convert to past game
+                SERVER.DATABASE.ConvertActiveGame(game).then((pastGame) => {
+                    game.hasBeenSavedToPastGame = true;
+                    console.log("Successfully converted active game to past game! Active game is safe to destroy!");
+                }).catch((err) => {
+                    console.error("Error converting active game to past game:", err);
+                });
+            });
+
+            resolve({ok: true, game: exports.GetGame()});
+        }).catch((err) => reject);
     });
+}
 
-    return {ok: true}
+function convertDatabaseCategoriesToRuleSets(categories) {
+    let rules = [];
+    for(let i = 0; i < categories.length; i++) {
+        rules.push(new ActiveGameRuleSet(categories[i].title).setAllowedWords(categories[i].words, categories[i].points));
+    }
+    console.log(rules);
+    return rules;
 }
