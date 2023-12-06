@@ -120,7 +120,7 @@ app.get("/pastGames/get/:USERNAME", (req, res) => {
 
 
 // ------------------------
-//    Category equests
+//    Category requests
 // ------------------------
 
 // creates a category
@@ -132,8 +132,8 @@ app.post("/create/category", function (req, res) {
   let array = req.body.cWords.split(",");
   for (var i = 0; i < array.length; i++) {
     if (i % 2 == 0) {
-      words.push(array[i]);
-    } else { points.push(parseInt(array[i])) };
+      words.push(array[i].trim());
+    } else { points.push(parseInt(array[i].trim())) };
   }
 
   DATABASE.CreateCategory(req.body.cTitle, req.body.cDescription, words, points).then((response) => {
@@ -178,12 +178,45 @@ app.get('/get/words/:category', function (req, res) {
   })
 });
 
+// deletes a word from a category
+app.get('/delete/words/:category/:word', function (req, res) {
+  DATABASE.DeleteWordCategory({ title: req.params.category }, req.params.word).then(() => {
+	console.log('word deleted if word was in the database');
+	res.end('word deleted if word was in the database');
+  }).catch((error) => {
+    console.log('Save failed');
+    console.log(error);
+    res.end('Category Failed!');
+  });
+});
+
+// adds a word to a category
+app.get('/add/words/:category/:word', function (req, res) {
+  DATABASE.AddWordCategory({ title: req.params.category }, req.params.word).then(() => {
+    console.log('Word Added Successfully');
+    res.end('Word Added');
+  }).catch((error) => {
+    console.log('Save failed');
+    console.log(error);
+    res.end('Category Failed!');
+  });
+});
+
+// deletes a category
+app.get('/delete/:category', function (req, res) {
+  DATABASE.FindAndDeleteCategory({ title : req.params.category }).then(() => {
+	console.log("Category Deleted");
+  }).catch( (error) => {
+    console.log(error);
+    res.end('Get Category Fail');
+  });
+});
+
 // ------------------------
 //    Login requests
 // ------------------------
 
 app.post('/account/login', (req, res) => {
-  console.log(sessions);
   let u = req.body;
   DATABASE.FindUser(u.username, u.password).then((results) => {
     if (results.length == 0) {

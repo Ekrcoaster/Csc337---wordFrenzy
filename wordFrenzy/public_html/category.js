@@ -16,11 +16,11 @@
 	let cd = document.getElementById("categoryDescription");
 	let nw = document.getElementById("newWords");
 	let post = {cTitle: ct.value, cDescription: cd.value, cWords: nw.value};
-
+	
     fetch("/create/category", {
         method: "POST",
         body: JSON.stringify(post),
-		headers: { 'Content-Type': 'application/json'}
+		headers: { 'Content-Type': 'application/json'},
     }).then((res) => {
         if (res.error) {
             alert("Error: " + res.error);
@@ -65,7 +65,11 @@ function displayWords(but) {
 		html += '<button id="addWordsCategory" onclick="addWords(this)" name="'+category+'">Add Word</button>';
 		html += '<button id="deleteWordsCategory" onclick="deleteWords(this)" name="'+category+'">Delete Word</button>';
 		html += '<button id="deleteCategoryButton" onclick="deleteCategory(this)" name="'+category+'">Delete This  Category</button></div>';
+		html += '<p class="instructions">Add new words in the format of "newWord,2", in which you have the word you want followed by a comma followed by the point amount of that word (do not add the two quotes in the new word field), then hit the "Add Word" button.</p>'
+		html += '<p class="instructions">Delete words by just typing the word you want to delete and hit the "Delete Word" button. Spaces do not matter when you add words or delete them, but just make sure to follow the format with a comma between the word and number.</p>'
+		html += '<p class="instructions">If you want to delete a category, hit the "Delete This Category" button. It will give you a warning the first time. If you really want to delete it, hit the button again and it will disappear.</p>'
 		x.innerHTML = html;
+		deleteCat = false;
 	}).catch((err) => {
 		alert(err);
 	});
@@ -78,6 +82,7 @@ function deleteWords(but) {
 	let category = but.name;
 	fetch("/delete/words/" + category + "/" + x.value).then((response) => {
 		console.log('Word Deleted');
+		displayWords(but);
 	}).catch((err) => {
 		alert(err);
 	});
@@ -90,6 +95,7 @@ function addWords(but) {
 	let category = but.name;
 	fetch("/add/words/" + category + "/" + x.value).then((response) => {
 		console.log('Word Added');
+		displayWords(but);
 	}).catch((err) => {
 		alert(err);
 	});

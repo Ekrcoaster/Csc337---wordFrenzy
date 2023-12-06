@@ -68,6 +68,52 @@ exports.GetCustomCategories = function (searchParams = {}) {
     return Category.find(searchParams);
 }
 
+exports.AddWordCategory = function (title, word) {
+	let p = Category.find(title).exec();
+    return p.then((response) => {
+	  let newWord = word.split(",");
+	  let words = response[0].words;
+	  let points = response[0].points;
+
+	  let index = words.indexOf(newWord[0]);
+	  if (index < 0) {
+		words.push(newWord[0].trim());
+	    points.push(newWord[1].trim());
+	  }  
+		
+	  response[0].words = words;
+	  response[0].points = points;
+	  
+	  return response[0].save();
+	});
+    p.catch( (error) => {
+      console.log(error);
+      res.end('Get Category Fail');
+    });
+}
+
+exports.DeleteWordCategory = function (title, word) {
+	let p = Category.find(title).exec();
+    return p.then((response) => {
+	  let words = response[0].words;
+	  let points = response[0].points;
+	  
+	  let index = words.indexOf(word.trim());
+	  if (index > -1) {
+		words.splice(index, 1);
+		points.splice(index,1);
+	  }  
+	  
+	  response[0].words = words;
+	  response[0].points = points;
+	  return response[0].save();
+	});
+    p.catch( (error) => {
+      console.log(error);
+      res.end('Get Category Fail');
+    });
+}
+
 exports.CreateCategory = function (title, description, words, points) {
     let newCategory = new Category;
 
@@ -81,6 +127,10 @@ exports.CreateCategory = function (title, description, words, points) {
     return newCategory.save();
 }
 
+exports.FindAndDeleteCategory = function (title) {
+    return Category.findOneAndDelete(title);
+}
+
 var UserSchema = new mongoose.Schema({
     username: String,
     password: String
@@ -89,7 +139,7 @@ var User = mongoose.model('User', UserSchema);
 
 exports.CreateUser = function (username, password) {
     let newUser = new User();
-    newUser.usernaame = username;
+    newUser.username = username;
     newUser.password = password;
 
     return newUser.save();
