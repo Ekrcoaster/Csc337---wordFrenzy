@@ -135,7 +135,7 @@ app.post("/create/category", function (req, res) {
   let array = req.body.cWords.split(",");
   for (var i = 0; i < array.length; i++) {
     if (i % 2 == 0) {
-      words.push(array[i].trim());
+      words.push(array[i].toLowerCase().trim());
     } else { points.push(parseInt(array[i].trim())) };
   }
 
