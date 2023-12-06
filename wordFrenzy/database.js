@@ -9,6 +9,7 @@
 // THE DATABASE
 // --------------
 
+const md5 = require("md5");
 const mongoose = require("mongoose");
 const mongoDBURL = "mongodb://127.0.0.1:27017/wordFrenzy";
 mongoose.connect(mongoDBURL);
@@ -140,13 +141,13 @@ var User = mongoose.model('User', UserSchema);
 exports.CreateUser = function (username, password) {
     let newUser = new User();
     newUser.username = username;
-    newUser.password = password;
+    newUser.password = md5(password);
 
     return newUser.save();
 }
 
 exports.FindUser = function (user, pass) {
-    return User.find({ username: user, password: pass })
+    return User.find({ username: user, password: md5(pass) })
 }
 
 exports.FindUserJustUsername = function (user) {
