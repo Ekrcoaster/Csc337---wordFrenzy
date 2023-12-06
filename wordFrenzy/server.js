@@ -37,7 +37,6 @@ function removeSessions() {
       delete sessions[usernames[i]];
     }
   }
-  console.log(sessions);
 }
 
 setInterval(removeSessions, 2000);
@@ -61,18 +60,22 @@ app.listen(port, () => {
  */
 function handleLockedPage(req, res, next) {
   let c = req.cookies;
-  console.log('auth request:');
-  console.log(req.cookies);
-  if (c != undefined && c.login != undefined) {
-    if (sessions[c.login.username] != undefined &&
+  console.log(`Attempt to access private page. Their cookie: `, c);
+  if (c != null && c.login != null) {
+    console.log(`Their found session:`, sessions[c.login.username]);
+    if (sessions[c.login.username] != null &&
       sessions[c.login.username].id == c.login.sessionID) {
       next();
+      console.log(`Good to go!`);
     } else {
       res.redirect('/index.html');
+      console.log(`Failed session match!`);
     }
   } else {
     res.redirect('/index.html');
+    console.log(`No cookies!`);
   }
+  console.log("----");
 }
 
 
@@ -183,7 +186,6 @@ app.get('/get/words/:category', function (req, res) {
 // ------------------------
 
 app.post('/account/login', (req, res) => {
-  console.log(sessions);
   let u = req.body;
   DATABASE.FindUser(u.username, u.password).then((results) => {
     if (results.length == 0) {
@@ -192,7 +194,7 @@ app.post('/account/login', (req, res) => {
       let sid = addSession(u.username);
       res.cookie("login",
         { username: u.username, sessionID: sid },
-        { maxAge: 60000 * 2 });
+        { maxAge: 1000 * 60 * 10 });
       res.end('SUCCESS');
     }
   });

@@ -89,7 +89,7 @@ function addWords(but) {
 	if (x.value == "") {alert("No Word Input to Add"); return;}
 	let category = but.name;
 	fetch("/add/words/" + category + "/" + x.value).then((response) => {
-		console.log('Word Added');
+		('Word Added');
 	}).catch((err) => {
 		alert(err);
 	});
