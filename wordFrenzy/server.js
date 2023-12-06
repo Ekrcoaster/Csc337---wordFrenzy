@@ -60,22 +60,16 @@ app.listen(port, () => {
  */
 function handleLockedPage(req, res, next) {
   let c = req.cookies;
-  console.log(`Attempt to access private page. Their cookie: `, c);
   if (c != null && c.login != null) {
-    console.log(`Their found session:`, sessions[c.login.username]);
     if (sessions[c.login.username] != null &&
       sessions[c.login.username].id == c.login.sessionID) {
       next();
-      console.log(`Good to go!`);
     } else {
       res.redirect('/index.html');
-      console.log(`Failed session match!`);
     }
   } else {
     res.redirect('/index.html');
-    console.log(`No cookies!`);
   }
-  console.log("----");
 }
 
 
@@ -184,7 +178,6 @@ app.get('/get/words/:category', function (req, res) {
 // deletes a word from a category
 app.get('/delete/words/:category/:word', function (req, res) {
   DATABASE.DeleteWordCategory({ title: req.params.category }, req.params.word).then(() => {
-	console.log('word deleted if word was in the database');
 	res.end('word deleted if word was in the database');
   }).catch((error) => {
     console.log('Save failed');
@@ -196,7 +189,6 @@ app.get('/delete/words/:category/:word', function (req, res) {
 // adds a word to a category
 app.get('/add/words/:category/:word', function (req, res) {
   DATABASE.AddWordCategory({ title: req.params.category }, req.params.word).then(() => {
-    console.log('Word Added Successfully');
     res.end('Word Added');
   }).catch((error) => {
     console.log('Save failed');
@@ -232,6 +224,16 @@ app.post('/account/login', (req, res) => {
       res.end('SUCCESS');
     }
   });
+});
+
+app.post('/account/logout', (req, res) => {
+  let name = req.cookies?.login?.username;
+  if(name == null) {
+    res.json({error: "Account doesn't exist"});
+  } else {
+    delete sessions[name];
+    res.json({ok: true});
+  }
 });
 
 app.get('/account/create/:user/:pass', (req, res) => {
