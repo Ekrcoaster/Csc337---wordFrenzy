@@ -166,3 +166,24 @@ input {
     font-size: 20px;
     opacity: 0.5;
 }
+
+#ending {
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    z-index: 2;
+    background-color: black;
+    text-align: center;
+}
+
+#endingText {
+    font-size: 75px;
+}
+
+#ending a {
+    margin: 10px;
+    font-size: 20px;
+}

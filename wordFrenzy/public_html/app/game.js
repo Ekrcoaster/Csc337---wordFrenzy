@@ -26,7 +26,8 @@ var onGameUpdate = (game => {
     }
 
     if(game.state == "done") {
-        location.href = "/app/results.html";
+        document.getElementById("ending").style.display = "block";
+        document.getElementById("endingText").innerText = `${game.scores[0].name} has won!`;
         return;
     }
 
