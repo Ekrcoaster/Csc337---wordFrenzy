@@ -13,10 +13,16 @@ body {
 
 /* Segment styling */
 .segment {
-    border: 5px solid rgb(94, 163, 56);
+    /* Adding border */
+    margin: auto;
+    /* Centering horizontally */
+    width: fit-content;
+    /* Adjust width to fit content */
+    padding: 2em;
+    /* Adding some padding */
     text-align: center;
-    padding: 20px;
-    margin: 20px;
+    /* Center text inside the div */
+    font-size: 25px;
 }
 
 /* Input and label styling */
@@ -34,18 +40,20 @@ label {
 }
 
 /* Button styling */
-button {
-    background-color: rgb(94, 163, 56);
-    color: rgb(51, 42, 48);
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
+#button {
+    border: 0px;
+    border-radius: 5px;
+    border-left: 2px solid rgb(87, 218, 67);
+    border-right: 2px solid rgb(87, 218, 67);
+    background-color: rgba(87, 218, 67, 0.119);
+    margin: 8px auto 8px auto;
+    display: block;
+    font-size: 15px;
+    padding: 10px;
 }
 
-button:hover {
-    background-color: rgb(51, 42, 48);
-    color: rgb(94, 163, 56);
-    border: 2px solid rgb(94, 163, 56);
+#button:hover {
+    background-color: #218838;
 }
 
 /* Responsive adjustments */
@@ -64,13 +72,15 @@ button:hover {
     /* Centering horizontally */
     width: fit-content;
     /* Adjust width to fit content */
-    padding: 20px;
+    padding: 2em;
     /* Adding some padding */
     text-align: center;
     /* Center text inside the div */
+    border-radius: 30px;
 }
+
 
 /* add some space between the login and create account sections */
 .login+.create-account {
-    margin-top: 20px;
+    margin-top: 60px;
 }

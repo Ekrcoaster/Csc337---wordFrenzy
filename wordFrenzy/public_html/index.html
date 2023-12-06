@@ -6,38 +6,36 @@
 
 <head>
     <script src="/login.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="style.css">
     <link type="text/css" rel="stylesheet" href="index.css">
     <title>WORD FRENZY - LOGIN</title>
 </head>
 
 <body>
 
-    <div class="segment" id="responsibilities">
+    <div class="segment">
         <h2>Welcome to Word Frenzy!</h2>
     </div>
 
     <div class="login">
         <div>LOG IN</div>
-        <label for="usernameLogin">Username</label>
-        <input id="usernameLogin" type="text"> </input>
+        <input id="usernameLogin" type="text" placeholder="Username"> </input>
         <br />
-        <label for="passwordLogin">Password</label>
-        <input id="passwordLogin" type="password"> </input>
+        <input id="passwordLogin" type="password" placeholder="Password"> </input>
         <br />
-        <input type="button" onclick="login();" value="Log in" />
+        <input type="button" id="button" onclick="login();" value="Log in" />
     </div>
 
     <br />
 
     <div class="create-account">
         <div>CREATE AN ACCOUNT</div>
-        <label for="usernameCreate">Username</label>
-        <input id="usernameCreate" type="text"> </input>
+        <input id="usernameCreate" type="text" placeholder="Username"> </input>
         <br />
-        <label for="passwordCreate">Password</label>
-        <input id="passwordCreate" type="password"> </input>
+        <input id="passwordCreate" type="password" placeholder="Password"> </input>
         <br />
-        <input type="button" onclick="createAccount();" value="Create Account" />
+        <input type="button" id="button" onclick="createAccount();" value="Create Account" />
     </div>
 
 </body>
