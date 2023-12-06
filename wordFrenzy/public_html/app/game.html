@@ -1,36 +1,49 @@
+<!-- Name:  -->
+<!-- Class: Csc337 -->
+<!-- Purpose: This is the main HTML for the game page of word frenzy -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <title>Word Frenzy</title>
         <meta charset="UTF-8">
+        <link href="../style.css" type="text/css" rel="stylesheet">
         <link type="text/css" rel="stylesheet" href="game.css">
-        <script src="game.js"></script>
     </head>
     <body>
-        <div id="pageTitle">Word Frenzy</div>
-        <div id="playerSide">
+        <div id="pageTitle" class="shadow border textShadow borderText">Word Frenzy</div>
+        <div id="playerSide" class="shadow border">
             <br><br>
+            <div class="sideSubtext">NAME</div>
             <div id="playerName">Player 1</div>
+            <div class="sideSubtext">SCORE</div>
             <div id="playerScore">Score: 0</div>
+            <div class="sideSubtext">GUESSES</div>
             <div id="playerGuesses">Guesses: 0</div>
             <br><br>
-            <input id="playerGuess" type="text">
-            <button id="guessWord" onclick="sendSubmission();">GUESS</button>
-            <div id="playerProfile" class="profilePic">.png</div>
+            <div id="playerProfile" class="profilePic shadow">.png</div>
         </div>
-        <div id="wordDisplay">
+        <div id="wordDisplay" class="shadow border">
             <div id="category">List car brands</div>
             <div id="timer">Time: 00:00</div>
-            <div id="submissionDisplay">
-                
-            </div>
         </div>
-        <div id="opponentSide">
+        <div id="submissionDisplay" class="shadow border">
+            
+        </div>
+        <div id="guessBox" class="shadow border">
+            <input id="playerGuess" type="text">
+            <button id="guessWord" onclick="sendSubmission();" class="shadow borderText">SEND GUESS</button>
+        </div>
+        <div id="opponentSide" class="shadow border">
             <br><br>
+            <div class="sideSubtext">NAME</div>
             <div id="opponentName">Player 2</div>
+            <div class="sideSubtext">SCORE</div>
             <div id="opponentScore">Score: 0</div>
+            <div class="sideSubtext">GUESSES</div>
             <div id="opponentGuesses">Guesses: 0</div>
-            <div id="opponentProfile" class="profilePic">.png</div>
+            <div id="opponentProfile" class="profilePic shadow">.png</div>
         </div>
+        <script src="game.js"></script>
     </body>
 </html>
