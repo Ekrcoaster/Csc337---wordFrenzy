@@ -265,7 +265,7 @@ exports.GetGame = () => {
         scores: ACTIVE_GAME.getPlayerScores(),
         startedAt: ACTIVE_GAME.gameStartedAt,
         ruleSet: ACTIVE_GAME.ruleSet.name,
-        playerNames: Object.keys(ACTIVE_GAME.players)
+        playerNames: Object.keys(ACTIVE_GAME.players),
     }
 }
 
