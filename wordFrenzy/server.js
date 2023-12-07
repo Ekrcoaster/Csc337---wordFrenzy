@@ -282,6 +282,17 @@ app.get('/account/achievement', (req, res) => {
   });
 });
 
+// adds data for user achievements
+app.get('/add/achievement/:submissions', function (req, res) {
+	let name = req.cookies.login.username;
+  DATABASE.UpdateAchievement(name, { submissions: req.params.submissions }).then(() => {
+    res.end('Achievement Checked');
+  }).catch((error) => {
+    console.log('Save failed');
+    console.log(error);
+    res.end('Category Failed!');
+  });
+});
 // ------------------------
 //    LeaderBoard requests
 // ---

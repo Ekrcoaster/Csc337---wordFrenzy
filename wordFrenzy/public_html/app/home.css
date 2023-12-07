@@ -15,7 +15,7 @@ h1 {
     font-size: 55px;
     margin: 0px;
     position: absolute;
-    top: 75px;
+    top: 60px;
     left: 50%;
     transform: translateX(-50%);
 }

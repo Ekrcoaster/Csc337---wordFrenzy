@@ -82,13 +82,12 @@ class ActiveGame {
             // after gameTime is done, automatically stop
             setTimeout(() => {
                 this.setState("done");
-				console.log("done");
-				checkForAchievements({
+				/*checkForAchievements({
 				state: ACTIVE_GAME.state,
 				submissions: ACTIVE_GAME.submissions,
 				scores: ACTIVE_GAME.getPlayerScores(),
 				playerNames: Object.keys(ACTIVE_GAME.players),
-				});
+				});*/
             }, this.gameTime);
         }
 
@@ -340,5 +339,21 @@ function convertDatabaseCategoriesToRuleSets(categories) {
 }
 
 function checkForAchievements(gameData) {
-	console.log(gameData);
+	let sub = gameData[0].submissions;
+	fetch('/account/achievement/').then((response) => {
+    return response.text();
+  }).then((text) => {
+	if (text != "") {
+		if (text.indexOf('!') > -1) {
+			let achieve = text.split("!");
+			for (let i = 0; i < achieve.length; i++) {
+				document.getElementById(achieve[i]).className = 'yes';
+			}
+		} else {
+			document.getElementById(achieve).className = 'yes';
+		}
+	}
+  }).catch( (error) => {
+    console.log(error);
+  }); 
 }

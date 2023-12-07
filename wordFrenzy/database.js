@@ -136,8 +136,23 @@ var achievementArray = [{ name: "firstGame", achieved: 0 }, { name: "fifthGame",
 	{ name: "teenGame", achieved: 0 }, { name: "hunGame", achieved: 0 }, { name: "firstGuess", achieved: 0 },
 	{ name: "hunGuess", achieved: 0 }, { name: "oneWin", achieved: 0 }];
 	
-exports.UpdateAchievement = function (a) {
-
+exports.UpdateAchievement = function (user, gameData) {
+	let p = User.find({ username: user }).exec();
+    return p.then((response) => {
+	  let guesses = response[0].guesses + gameData[0].submissions;
+	  let wins = response[0].wins + gameData[0].result;
+	  let games = response[0].games + 1;
+		
+	  response[0].games = games;
+	  response[0].wins = wins;
+	  response[0].wins = wins;
+	  
+	  return response[0].save();
+	});
+    p.catch( (error) => {
+      console.log(error);
+      res.end('Get User Fail');
+    });
 }
 
 var UserSchema = new mongoose.Schema({
