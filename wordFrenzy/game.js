@@ -45,7 +45,6 @@ class ActiveGame {
         this.state = "waitingRoom";
         // choose a random room from the list, if you would like to choose this rule, provide a list of 1
         this.ruleSet = possibleRules[Math.floor(Math.random() * possibleRules.length)];
-		console.log(ruleSet);
 
         this.onGameComplete = onGameComplete;
         this.hasBeenSavedToPastGame = false;
@@ -267,7 +266,6 @@ exports.Start = () => {
     console.log(`Trying: "apple Yum"  --  ${ACTIVE_GAME.sendSubmission("bob", "Apple Yum")}`);
     console.log(`Trying: "rhyme"  --  ${ACTIVE_GAME.sendSubmission("alice", "Rhyme")}`);
 }
-exports.Start();
 
 exports.GameExists = () => {
     return ACTIVE_GAME != null;
@@ -344,7 +342,10 @@ exports.CreateGame = () => {
 
                 // convert to past game
                 SERVER.DATABASE.ConvertActiveGame(game).then((pastGame) => {
-                    game.hasBeenSavedToPastGame = true;
+
+                    setTimeout(() => {
+                        game.hasBeenSavedToPastGame = true;
+                    }, 4000);
                     console.log("Successfully converted active game to past game! Active game is safe to destroy!");
                 }).catch((err) => {
                     console.error("Error converting active game to past game:", err);
@@ -352,8 +353,13 @@ exports.CreateGame = () => {
             });
 
             resolve({ok: true, game: exports.GetGame()});
-        }).catch((err) => reject);
+        }).catch((err) => reject(err));
     });
+}
+
+exports.IsSafeToDestroy = () => {
+    if(ACTIVE_GAME == null) return true;
+    return ACTIVE_GAME.isSafeToDestroy();
 }
 
 /**

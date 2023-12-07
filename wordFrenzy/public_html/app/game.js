@@ -25,7 +25,8 @@ var onGameUpdate = (game => {
         return;
     }
 
-    if(game.state == "done") {
+    let time = calculateTimeDifference(game.gameOverAt);
+    if(game.state == "done" || isNaN(time.mins) || time.mins.toLowerCase() == "nan") {
         document.getElementById("ending").style.display = "block";
         document.getElementById("endingText").innerText = `${game.scores[0].name} has won!`;
         return;
@@ -34,7 +35,6 @@ var onGameUpdate = (game => {
     myName = getCookies().login.username;
 
     document.getElementById("category").innerText = '"' + game.ruleSet + '"';
-    let time = calculateTimeDifference(game.gameOverAt);
     document.getElementById("timer").innerText = `Time: ${time.mins}:${time.secs}`
 
     updatePlayerStats(game);

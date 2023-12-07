@@ -87,7 +87,8 @@ app.post("/activeGame/start", (req, res) => {
 });
 
 app.get("/activeGame/getGame", (req, res) => {
-  if(!GAME.GameExists()) {
+  if(!GAME.GameExists() || GAME.IsSafeToDestroy()) {
+    console.log("created gmae");
     GAME.CreateGame().then((result) => {
       res.json(result); 
     }).catch((err) => {
