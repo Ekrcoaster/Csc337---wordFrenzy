@@ -42,7 +42,7 @@ function removeSessions() {
 setInterval(removeSessions, 2000);
 
 const app = express();
-const port = 5001;
+const port = 80;
 
 app.use(bodyParser.json());
 app.use(cookieParser());
