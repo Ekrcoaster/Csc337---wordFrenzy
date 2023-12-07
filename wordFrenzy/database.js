@@ -169,3 +169,42 @@ exports.FindUser = function (user, pass) {
 exports.FindUserJustUsername = function (user) {
     return User.find({ username: user })
 }
+
+exports.GetLeaderboard = () => {
+    return new Promise((resolve, reject) => {
+        PastGame.find({ }).then((games) => {
+            let data = {
+                "games": [],
+                "scores": []
+            }
+
+            // step 1, count all of the different fields
+            let gameCount = {};
+            let scoreCount = {};
+            for(let i = 0; i < games.length; i++) {
+                for(let j = 0; j < games[i].scores.length; j++) {
+                    let name = games[i].scores[j].name;
+                    let score = games[i].scores[j].score;
+
+                    gameCount[name] = (gameCount[name] || 0) + (i == 0 ? 1 : 0);
+                    scoreCount[name] = (scoreCount[name] || 0) + score;
+                }
+            }
+
+            // step 2, put them all in an array
+            for(let name in gameCount)
+                data.games.push({name: name, score: gameCount[name]});
+            for(let name in scoreCount)
+                data.scores.push({name: name, score: scoreCount[name]});
+
+            // now, sort the data (largest first)
+            data.games.sort((a, b) => b.score - a.score);
+            data.scores.sort((a, b) => b.score - a.score);
+
+            resolve(data);
+
+        }).catch((err) => {
+            reject(err);
+        })
+    });
+}

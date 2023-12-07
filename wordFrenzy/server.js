@@ -42,7 +42,7 @@ function removeSessions() {
 setInterval(removeSessions, 2000);
 
 const app = express();
-const port = 5001;
+const port = 80;
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -256,7 +256,6 @@ app.get('/account/getName', (req, res) => {
   res.send(name);
 });
 
-
 // ------------------------
 //    Achievement requests
 // ------------------------
@@ -280,5 +279,17 @@ app.get('/account/achievement', (req, res) => {
 	  }
 	  res.end(done);
     }
+  });
+});
+
+// ------------------------
+//    LeaderBoard requests
+// ---
+
+app.get("/leaderboard/get", (req, res) => {
+  DATABASE.GetLeaderboard().then((leaderboard) => {
+    res.json({ leaderboard: leaderboard });
+  }).catch((err) => {
+    res.json({ error: err });
   });
 });

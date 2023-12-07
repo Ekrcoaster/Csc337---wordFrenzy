@@ -7,9 +7,12 @@
         <link type="text/css" rel="stylesheet" href="leaderboard.css">
     </head>
     <body>
-        <div id="pageTitle">Word Frenzy</div>
+        <div id="pageTitle" class="shadow textShadow">Word Frenzy Leaderboard</div>
+        <button id="scores" class="buttonToggle" onclick="setLeaderboard('scores')">Scores</button>
+        <button id="games" class="buttonToggle" onclick="setLeaderboard('games')"># of Games Won</button>
         <div id="leaderboard">
-            <div class="player">#1. | Name: Player 1 | Record: 19/20 | Winrate: 95%</div>
+            
         </div>
+        <script src="./leaderboard.js"></script>
     </body>
 </html>
