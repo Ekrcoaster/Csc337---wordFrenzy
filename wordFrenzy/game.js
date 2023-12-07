@@ -1,5 +1,5 @@
 /**
- * Authors:
+ * Authors: Ethan Rees, Joshua Boyer, Srinivas Pullela, Austin Hart
  * Course: Csc 337
  * Purpose: This is the main serverside code for the game
  */
@@ -51,17 +51,24 @@ class ActiveGame {
         this.hasBeenSavedToPastGame = false;
     }
 
+    /**
+     * Add a player
+     */
     addPlayer(player) {
         this.players[player.name] = player;
         return this;
     }
 
-    /**@returns {ActivePlayer} */
+    /**
+     * Get a player
+     * @returns {ActivePlayer} */
     getPlayer(name) {
         return this.players[name];
     }
 
-    /**@param {ActiveGameStates} state */
+    /**
+     * Set the state
+     * @param {ActiveGameStates} state */
     setState(state) {
         // prevent double calls
         if(state == this.state) return;
@@ -125,6 +132,10 @@ class ActiveGame {
         return Date.now() > this.gameOverAt;
     }
 
+
+    /**
+     *  Get player scores
+     */
     getPlayerScores() {
         let players = [];
         for(let name in this.players) {
@@ -261,6 +272,10 @@ exports.Start();
 exports.GameExists = () => {
     return ACTIVE_GAME != null;
 }
+
+/**
+ * this returns te game
+ */
 exports.GetGame = () => {
     return {
         state: ACTIVE_GAME.state,
@@ -273,6 +288,9 @@ exports.GetGame = () => {
     }
 }
 
+/**
+ * This will submit a submission
+ */
 exports.Submit = (name, submission) => {
     if(ACTIVE_GAME == null) return {error: "No game exists"};
     let result = ACTIVE_GAME.sendSubmission(name, submission);
@@ -280,6 +298,9 @@ exports.Submit = (name, submission) => {
     return {error: result}
 }
 
+/**
+ * This will add a player
+ */
 exports.AddPlayer = (name) => {
     if(ACTIVE_GAME == null) return {error: "No game exists"};
     if(name == null) return {error: "Username is null"}
@@ -288,6 +309,9 @@ exports.AddPlayer = (name) => {
     return {ok: true};
 }
 
+/**
+ * This will start a game
+ */
 exports.StartGame = () => {
     if(ACTIVE_GAME == null) return {error: "No game exists!"};
     if(ACTIVE_GAME.state != "waitingRoom") return {error: "Game is not in waiting room"};
@@ -296,6 +320,9 @@ exports.StartGame = () => {
     return {ok: true, game: exports.GetGame()}
 }
 
+/**
+ * This will create a game
+ */
 exports.CreateGame = () => {
     
     return new Promise((resolve, reject) => {
@@ -329,6 +356,9 @@ exports.CreateGame = () => {
     });
 }
 
+/**
+ * This will convert a category database to a rule set
+ */
 function convertDatabaseCategoriesToRuleSets(categories) {
     let rules = [];
 	console.log(rules);
@@ -338,6 +368,9 @@ function convertDatabaseCategoriesToRuleSets(categories) {
     return rules;
 }
 
+/**
+ * This will check for acheivements and update the html accordingly
+ */
 function checkForAchievements(gameData) {
 	let sub = gameData[0].submissions;
 	fetch('/account/achievement/').then((response) => {

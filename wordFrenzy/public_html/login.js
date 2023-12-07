@@ -1,11 +1,14 @@
 /**
- * Authors:
+ * Authors: Ethan Rees, Joshua Boyer, Srinivas Pullela, Austin Hart
  * Course: Csc 337
  * Purpose: This is the code for the login page
  */
 //const DATABASE = require("./database");
 //exports.DATABASE = DATABASE;
 
+/**
+ * This function will login the account
+ */
 function login() {
     let us = document.getElementById('usernameLogin').value;
     let pw = document.getElementById('passwordLogin').value;
@@ -27,6 +30,9 @@ function login() {
     });
 }
 
+/**
+ * This function will create the account
+ */
 function createAccount() {
     let us = document.getElementById('usernameCreate').value;
     let pw = document.getElementById('passwordCreate').value;

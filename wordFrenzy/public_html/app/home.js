@@ -1,9 +1,12 @@
 /**
- * Authors:
+ * Authors: Ethan Rees, Joshua Boyer, Srinivas Pullela, Austin Hart
  * Course: Csc 337
  * Purpose: This is the code for the game page
  */
 
+/**
+ * This function logs out the user
+ */
 function logOut() {
     fetch("/account/logout", {
         "method": "POST",

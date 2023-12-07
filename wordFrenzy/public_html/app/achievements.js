@@ -1,9 +1,12 @@
 /**
- * Authors:
+ * Authors: Ethan Rees, Joshua Boyer, Srinivas Pullela, Austin Hart
  * Course: Csc 337
  * Purpose: This is the code for the achievement page
  */
 	
+/**
+ * This function gets the achievements and loads them
+ */
 function getAchievements() {
   fetch('/account/achievement').then((response) => {
     return response.text();

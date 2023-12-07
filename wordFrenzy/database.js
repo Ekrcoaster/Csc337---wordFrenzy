@@ -1,5 +1,5 @@
 /**
- * Authors:
+ * Authors: Ethan Rees, Joshua Boyer, Srinivas Pullela, Austin Hart
  * Course: Csc 337
  * Purpose: This is the main database for the game.
  * It is split into its own file for simplicity and readability
