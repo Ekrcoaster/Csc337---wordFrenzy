@@ -78,7 +78,7 @@ exports.AddWordCategory = function (title, word) {
 
 	  let index = words.indexOf(newWord[0]);
 	  if (index < 0) {
-		words.push(newWord[0].trim());
+		words.push(newWord[0].toLowerCase().trim());
 	    points.push(newWord[1].trim());
 	  }  
 		
@@ -99,7 +99,7 @@ exports.DeleteWordCategory = function (title, word) {
 	  let words = response[0].words;
 	  let points = response[0].points;
 	  
-	  let index = words.indexOf(word.trim());
+	  let index = words.indexOf(word.toLowerCase().trim());
 	  if (index > -1) {
 		words.splice(index, 1);
 		points.splice(index,1);
