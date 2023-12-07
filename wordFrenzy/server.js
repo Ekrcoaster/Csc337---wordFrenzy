@@ -255,3 +255,11 @@ app.get('/account/getName', (req, res) => {
   let name = req.cookies.login;
   res.send(name);
 });
+
+app.get("/leaderboard/get", (req, res) => {
+  DATABASE.GetLeaderboard().then((leaderboard) => {
+    res.json({ leaderboard: leaderboard });
+  }).catch((err) => {
+    res.json({ error: err });
+  });
+})

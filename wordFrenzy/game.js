@@ -330,6 +330,5 @@ function convertDatabaseCategoriesToRuleSets(categories) {
     for(let i = 0; i < categories.length; i++) {
         rules.push(new ActiveGameRuleSet(categories[i].title).setAllowedWords(categories[i].words, categories[i].points));
     }
-    console.log(rules);
     return rules;
 }

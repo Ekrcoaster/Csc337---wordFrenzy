@@ -25,9 +25,23 @@ body {
 .pastGameWin {
     border: 5px solid rgb(94, 163, 56);
     font-size: 22px;
+    color: rgb(94, 163, 56);
+    padding: 10px;
+    background-color: rgba(94, 163, 56, 0.1);
+    margin: 10px;
+    border-radius: 5px;
+    border-top: none;
+    border-bottom: none;
 }
 
 .pastGameLoss {
-    border: 5px solid coral;
+    border: 3px solid  rgb(212, 45, 45);
     font-size: 22px;
+    padding: 10px;
+    color: rgb(212, 45, 45);
+    background-color: rgba(212, 45, 45, 0.1);
+    margin: 10px;
+    border-radius: 5px;
+    border-top: none;
+    border-bottom: none;
 }
