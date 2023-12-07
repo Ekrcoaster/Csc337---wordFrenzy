@@ -84,3 +84,15 @@ label {
 .login+.create-account {
     margin-top: 60px;
 }
+
+#helpPage {
+    position: absolute;
+    top: 10px;
+    right: 50%;
+    width: 100px;
+    translate: 50px;
+    text-align: center;
+    opacity: 0.7;
+    font-size: 25px;
+    margin-top: 10px;
+}
