@@ -255,3 +255,30 @@ app.get('/account/getName', (req, res) => {
   let name = req.cookies.login;
   res.send(name);
 });
+
+
+// ------------------------
+//    Achievement requests
+// ------------------------
+
+app.get('/account/achievement', (req, res) => {
+  let name = req.cookies.login.username;
+  DATABASE.FindUserJustUsername(name).then((results) => {
+    if (results.length == 0) {
+      res.end('Coult not find account');
+    } else {
+	  console.log(results);
+      let achieves = results[0].achievements;
+	  let done = "";
+	  for (var i = 0; i < achieves.length; i++) {
+		if (achieves[i].achieved == 1) {
+			if (done != "") {
+				done += "!";
+			}
+			done += achieves[i].name;
+		}
+	  }
+	  res.end(done);
+    }
+  });
+});

@@ -45,6 +45,7 @@ class ActiveGame {
         this.state = "waitingRoom";
         // choose a random room from the list, if you would like to choose this rule, provide a list of 1
         this.ruleSet = possibleRules[Math.floor(Math.random() * possibleRules.length)];
+		console.log(ruleSet);
 
         this.onGameComplete = onGameComplete;
         this.hasBeenSavedToPastGame = false;
@@ -81,6 +82,13 @@ class ActiveGame {
             // after gameTime is done, automatically stop
             setTimeout(() => {
                 this.setState("done");
+				console.log("done");
+				checkForAchievements({
+				state: ACTIVE_GAME.state,
+				submissions: ACTIVE_GAME.submissions,
+				scores: ACTIVE_GAME.getPlayerScores(),
+				playerNames: Object.keys(ACTIVE_GAME.players),
+				});
             }, this.gameTime);
         }
 
@@ -226,10 +234,7 @@ class ActiveGameRuleSet {
 
 /**@type {ActiveGame} */
 var ACTIVE_GAME = null;
-var POSSIBLE_GAME_SETS = [
-    new ActiveGameRuleSet("Words that start with A").setRegex("^a"),
-    new ActiveGameRuleSet("Words that rhyme with \"time\"").setAllowedWords(["crime", "rhyme"])
-]
+var POSSIBLE_GAME_SETS = [];
 
 exports.ACTIVE_GAME = ACTIVE_GAME;
 exports.Start = () => {
@@ -252,7 +257,7 @@ exports.Start = () => {
     console.log(`Trying: "apple Yum"  --  ${ACTIVE_GAME.sendSubmission("bob", "Apple Yum")}`);
     console.log(`Trying: "rhyme"  --  ${ACTIVE_GAME.sendSubmission("alice", "Rhyme")}`);
 }
-//exports.Start();
+exports.Start();
 
 exports.GameExists = () => {
     return ACTIVE_GAME != null;
@@ -327,9 +332,13 @@ exports.CreateGame = () => {
 
 function convertDatabaseCategoriesToRuleSets(categories) {
     let rules = [];
+	console.log(rules);
     for(let i = 0; i < categories.length; i++) {
         rules.push(new ActiveGameRuleSet(categories[i].title).setAllowedWords(categories[i].words, categories[i].points));
     }
-    console.log(rules);
     return rules;
+}
+
+function checkForAchievements(gameData) {
+	console.log(gameData);
 }

@@ -132,9 +132,21 @@ exports.FindAndDeleteCategory = function (title) {
     return Category.findOneAndDelete(title);
 }
 
+var achievementArray = [{ name: "firstGame", achieved: 0 }, { name: "fifthGame", achieved: 0 }, 
+	{ name: "teenGame", achieved: 0 }, { name: "hunGame", achieved: 0 }, { name: "firstGuess", achieved: 0 },
+	{ name: "hunGuess", achieved: 0 }, { name: "oneWin", achieved: 0 }];
+	
+exports.UpdateAchievement = function (a) {
+
+}
+
 var UserSchema = new mongoose.Schema({
     username: String,
-    password: String
+    password: String,
+	achievements: [{ name: String, achieved: Number }],
+	guesses: Number,
+	wins: Number,
+	games: Number
 });
 var User = mongoose.model('User', UserSchema);
 
@@ -142,6 +154,10 @@ exports.CreateUser = function (username, password) {
     let newUser = new User();
     newUser.username = username;
     newUser.password = md5(password);
+	newUser.achievements = achievementArray;
+	newUser.guesses = 0;
+	newUser.wins = 0;
+	newUser.games = 0;
 
     return newUser.save();
 }
